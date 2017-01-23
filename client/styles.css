@@ -1,0 +1,10 @@
+.tile {
+    width: 60px;
+    height: 80px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+.hand {
+    list-style: none;
+    display: inline-block;
+}
