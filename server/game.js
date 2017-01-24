@@ -5,9 +5,11 @@ game.wall = new Wall();
 game.tableDiscards = [];
 game.tableDiscard = undefined;
 game.players = [];
-game.turn = 0;
-game.master = 0;
 
+game.sit = function(player_data){
+    game.players.push(player_data);
+    console.log(game.players);
+};
 //cycling turn tracker
 function nextTurn(){
     if(turn >= 3){

@@ -7,10 +7,10 @@
     </head>
     <body>
         <div ng-controller="testController">
-            <button ng-click="sit(n)">Sit North</button>
-            <button ng-click="sit(w)">Sit West</button>
-            <button ng-click="sit(s)">Sit South</button>
-            <button ng-click="sit(e)">Sit East</button>
+            <button ng-click="sit('n')">Sit North</button>
+            <button ng-click="sit('w')">Sit West</button>
+            <button ng-click="sit('s')">Sit South</button>
+            <button ng-click="sit('e')">Sit East</button>
             <p>Discards:
                 <span class="hand ng-class: tile" ng-repeat="tile in data.tableDiscards">{{tile.suit}} {{tile.value}}</span>
             </p>
