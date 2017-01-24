@@ -10,18 +10,14 @@ app.factory('gameSocket', function (socketFactory){
 
 app.controller('testController', ['$scope', 'gameSocket', function($scope, gameSocket) {
 
-
+    $scope.startGame = function(){
+        $scope.gameStarted = true;
+        gameSocket.emit('startGame');
+    };
     //socket stuff
     $scope.$on('socket:giveID', function(event, data){
         gameSocket.player_id = data;
-        console.log(gameSocket.player_id);
     });
-    $scope.sit = function(position){
-        var player_info = {
-
-        };
-        gameSocket.emit('sit', player_info);
-    };
     $scope.discard = function(index){
         gameSocket.emit('discard_tile', index);
     };

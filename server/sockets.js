@@ -18,8 +18,10 @@ var webSocket = function(server){
     io.sockets.on('connection', function (socket) {
         var player_id = giveID();
         socket.emit('giveID', player_id);
-        socket.on('sit', function(player_data){
-            game.sit(player_data);
+        game.addPlayer(player_id);
+        socket.on('startGame', function(data){
+            game.startGame();
+            console.log(game.players);
         });
         socket.emit('game_start', game);
         socket.on('discard_tile', function(data){

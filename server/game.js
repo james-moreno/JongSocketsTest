@@ -6,9 +6,15 @@ game.tableDiscards = [];
 game.tableDiscard = undefined;
 game.players = [];
 
-game.sit = function(player_data){
-    game.players.push(player_data);
-    console.log(game.players);
+game.addPlayer = function(player_id){
+    game.players.push({
+        player_id: player_id,
+        hand: []
+    });
+};
+
+ game.startGame = function(){
+     game.wall.dealTiles();
 };
 //cycling turn tracker
 function nextTurn(){

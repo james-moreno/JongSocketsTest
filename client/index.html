@@ -7,22 +7,18 @@
     </head>
     <body>
         <div ng-controller="testController">
-            <button ng-click="sit('n')">Sit North</button>
-            <button ng-click="sit('w')">Sit West</button>
-            <button ng-click="sit('s')">Sit South</button>
-            <button ng-click="sit('e')">Sit East</button>
             <p>Discards:
                 <span class="hand ng-class: tile" ng-repeat="tile in data.tableDiscards">{{tile.suit}} {{tile.value}}</span>
             </p>
             <p>Most Recent Discard:
                 <span class="hand ng-class: tile">{{tableDiscard.suit}} {{tableDiscard.value}}</span>
             </p>
-            <p>Player One's Tiles:
-                <ul ng-repeat="player in data.players">
-                    Player {{player.name}}
+            <p>Your Tiles:
+                <ul>
                     <li ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in player.hand">{{tile.value}} {{tile.suit}}</li>
                 </ul>
             </p>
+            <button ng-hide="gameStarted" ng-click="startGame()">Start Game</button>
         </div>
         <script type ="text/javascript" src="socket.io/socket.io.js"></script>
         <script type="text/javascript" src="angular/angular.js"></script>
