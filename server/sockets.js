@@ -47,6 +47,15 @@ var webSocket = function(server){
             };
             io.sockets.emit('discardUpdate', discards);
         });
+        socket.on('pickup', function(data){
+            game.pickup(data);
+            var discards = {
+                discards: game.discards,
+                discarded: game.discarded
+            };
+            sendTiles();
+            io.sockets.emit('discardUpdate', discards);
+        });
     });
     return io;
 };

@@ -11,7 +11,7 @@
                 <span class="hand ng-class: tile" ng-repeat="tile in discards">{{tile.suit}} {{tile.value}}</span>
             </p>
             <p>Most Recent Discard:
-                <span class="hand ng-class: tile">{{discarded.suit}} {{discarded.value}}</span>
+                <span class="hand ng-class: tile" ng-click="pickup()">{{discarded.suit}} {{discarded.value}}</span>
             </p>
             <p>Your Tiles:
                 <ul>

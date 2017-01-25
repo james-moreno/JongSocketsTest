@@ -3,7 +3,7 @@ module.exports = game;
 
 game.wall = new Wall();
 game.discards = [];
-game.discarded = undefined;
+game.discarded = null;
 game.players = [];
 
 game.addPlayer = function(playerID){
@@ -34,6 +34,13 @@ game.discard = function(data){
     else {
         game.discards.push(game.discarded);
         game.discarded = tile[0];
+    }
+};
+
+game.pickup = function(data){
+    if(game.discarded){
+        game.players[data.playerID-1].hand.push(game.discarded);
+        game.discarded = null;
     }
 };
 
