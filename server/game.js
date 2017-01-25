@@ -26,11 +26,12 @@ function nextTurn(){
     }
 }
 
-// TurnFunction, Work in progress
-var normalTurn = function(playerNum){
-    var draw = newWall.wall.pop();
-    players[playerNum].hand.push(draw);
+game.discard = function(data){
+    var tile = game.players[data.playerID-1].hand.splice(data.tileIndex, 1);
+    newDiscard(tile[0]);
 };
+
+// TurnFunction, Work in progress
 
 var newDiscard = function (tile){
     if(game.tableDiscard === undefined){

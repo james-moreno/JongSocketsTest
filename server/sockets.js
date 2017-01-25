@@ -38,10 +38,9 @@ var webSocket = function(server){
             game.startGame();
             sendTiles();
         });
-        socket.emit('game_start', game);
-        socket.on('discard_tile', function(data){
-            game.players[0].discard(data);
-            socket.emit('game_update', game);
+        socket.on('discardTile', function(data){
+            game.discard(data);
+            sendTiles();
         });
     });
     return io;
