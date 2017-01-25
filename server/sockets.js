@@ -45,8 +45,7 @@ var webSocket = function(server){
                 discards: game.discards,
                 discarded: game.discarded
             };
-            console.log(discards);
-            socket.emit('discardUpdate', discards);
+            io.sockets.emit('discardUpdate', discards);
         });
     });
     return io;
