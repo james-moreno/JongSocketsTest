@@ -15,7 +15,7 @@
             </p>
             <p>Your Tiles:
                 <ul>
-                    <li ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in player.hand">{{tile.value}} {{tile.suit}}</li>
+                    <li ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">{{tile.value}} {{tile.suit}}</li>
                 </ul>
             </p>
             <button ng-hide="gameStarted" ng-click="startGame()">Start Game</button>

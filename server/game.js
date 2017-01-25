@@ -6,9 +6,9 @@ game.tableDiscards = [];
 game.tableDiscard = undefined;
 game.players = [];
 
-game.addPlayer = function(player_id){
+game.addPlayer = function(playerID){
     game.players.push({
-        player_id: player_id,
+        playerID: playerID,
         hand: []
     });
 };
