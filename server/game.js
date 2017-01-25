@@ -2,8 +2,8 @@ var game = {};
 module.exports = game;
 
 game.wall = new Wall();
-game.tableDiscards = [];
-game.tableDiscard = undefined;
+game.discards = [];
+game.discarded = undefined;
 game.players = [];
 
 game.addPlayer = function(playerID){
@@ -28,20 +28,26 @@ function nextTurn(){
 
 game.discard = function(data){
     var tile = game.players[data.playerID-1].hand.splice(data.tileIndex, 1);
-    newDiscard(tile[0]);
-};
-
-// TurnFunction, Work in progress
-
-var newDiscard = function (tile){
-    if(game.tableDiscard === undefined){
-        game.tableDiscard = tile;
+    if(game.discarded === undefined){
+        game.discarded = tile[0];
     }
-    else{
-        game.tableDiscards.push(game.tableDiscard);
-        game.tableDiscard = tile;
+    else {
+        game.discards.push(game.discarded);
+        game.discarded = tile[0];
     }
 };
+
+// // TurnFunction, Work in progress
+//
+// var newDiscard = function (tile){
+//     if(game.discarded === undefined){
+//         game.discarded = tile;
+//     }
+//     else{
+//         game.discards.push(game.Discarded);
+//         game.discarded = tile;
+//     }
+// };
 
 
 //Tile Class

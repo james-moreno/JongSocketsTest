@@ -6,6 +6,7 @@ app.factory('gameSocket', function (socketFactory){
     jongSocket.forward('game_start');
     jongSocket.forward('gameStarting');
     jongSocket.forward('dealTiles');
+    jongSocket.forward('discardUpdate');
     return jongSocket;
 });
 
@@ -25,6 +26,10 @@ app.controller('testController', ['$scope', 'gameSocket', function($scope, gameS
         };
         gameSocket.emit('discardTile', discardData);
     };
+    $scope.$on('socket:discardUpdate', function(event, discards){
+        $scope.discards = discards.discards;
+        $scope.discarded = discards.discarded;
+    });
     $scope.$on('socket:dealTiles', function(event, data) {
         $scope.gameStarted = true;
         $scope.hand = data;

@@ -41,6 +41,12 @@ var webSocket = function(server){
         socket.on('discardTile', function(data){
             game.discard(data);
             sendTiles();
+            var discards = {
+                discards: game.discards,
+                discarded: game.discarded
+            };
+            console.log(discards);
+            socket.emit('discardUpdate', discards);
         });
     });
     return io;
