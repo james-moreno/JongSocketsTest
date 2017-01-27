@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="/styles.css" media="screen" title="no title">
     </head>
     <body>
+        <h1>Mahjong</h1>
         <div ng-controller="testController">
             <p>Discards:
                 <span ng-show="discards" class="hand ng-class: tile" ng-repeat="tile in discards">{{tile.suit}} {{tile.value}}</span>
@@ -14,6 +15,7 @@
             <p>Most Recent Discard:
                 <span ng-show="discarded" class="hand ng-class: tile" ng-click="pickup()">{{discarded.suit}} {{discarded.value}}</span>
             </p>
+            <h3>Your Turn!</h3>
             <p>Your Tiles:
                 <ul>
                     <li ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">{{tile.value}} {{tile.suit}}</li>

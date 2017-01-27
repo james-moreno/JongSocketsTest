@@ -21,6 +21,7 @@ var webSocket = function(server){
     var sendTiles = function(){
         var hand;
         for(var idx = 0; idx < clients.length; idx++){
+            game.players[idx].sortHand();
             hand = game.players[idx].hand;
             socket = clients[idx].socketID;
             io.to(socket).emit('dealTiles', hand);

@@ -7,24 +7,14 @@ game.discarded = null;
 game.players = [];
 
 game.addPlayer = function(playerID){
-    game.players.push({
-        playerID: playerID,
-        hand: []
-    });
+    game.players.push(
+        new Player(playerID)
+    );
 };
 
  game.startGame = function(){
      game.wall.dealTiles();
 };
-//cycling turn tracker
-function nextTurn(){
-    if(turn >= 3){
-        turn = 0;
-    }
-    else {
-        turn++;
-    }
-}
 
 game.discard = function(data){
     var tile = game.players[data.playerID-1].hand.splice(data.tileIndex, 1);
@@ -44,19 +34,6 @@ game.pickup = function(data){
     }
 };
 
-// // TurnFunction, Work in progress
-//
-// var newDiscard = function (tile){
-//     if(game.discarded === undefined){
-//         game.discarded = tile;
-//     }
-//     else{
-//         game.discards.push(game.Discarded);
-//         game.discarded = tile;
-//     }
-// };
-
-
 //Tile Class
 function Tile (suit, value){
     this.suit = suit;
@@ -73,13 +50,13 @@ function Wall() {
             this.wall[this.wall.length] = new Tile('aspot', i);
             this.wall[this.wall.length] = new Tile('char', i);
         }
-        this.wall[this.wall.length] = new Tile("north", null);
-        this.wall[this.wall.length] = new Tile("east", null);
-        this.wall[this.wall.length] = new Tile("south", null);
-        this.wall[this.wall.length] = new Tile("west", null);
-        this.wall[this.wall.length] = new Tile("middle", null);
-        this.wall[this.wall.length] = new Tile("prosperity", null);
-        this.wall[this.wall.length] = new Tile("white", j);
+        this.wall[this.wall.length] = new Tile("dnorth", null);
+        this.wall[this.wall.length] = new Tile("deast", null);
+        this.wall[this.wall.length] = new Tile("dsouth", null);
+        this.wall[this.wall.length] = new Tile("dwest", null);
+        this.wall[this.wall.length] = new Tile("emiddle", null);
+        this.wall[this.wall.length] = new Tile("eprosperity", null);
+        this.wall[this.wall.length] = new Tile("ewhite", j);
         this.wall[this.wall.length] = new Tile("flower", j);
         this.wall[this.wall.length] = new Tile("season", j);
     }
@@ -109,9 +86,10 @@ Wall.prototype.dealTiles = function(){
 
 
 //Player Class
-function Player(name){
-    this.name = name;
-    this.hand= [];
+function Player(playerID){
+    this.name = playerID;
+    this.hand = [];
+    this.turn = false;
 }
 Player.prototype.drawTile = function(){
     this.hand.push(newWall.wall.pop());
@@ -141,23 +119,9 @@ return function (o, p) {
 Player.prototype.sortHand = function(){
     this.hand.sort(this.sortBy('suit', this.sortBy('value')));
 };
-Player.prototype.roll = function(){
-    var roll = (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1);
-    console.log(roll);
-    return roll;
-};
-
-//Tests
-// var playerOne = new Player("1");
-// var playerTwo = new Player("2");
-// var playerThree = new Player("3");
-// var playerFour = new Player("4");
-//
-// game.players.push(playerOne, playerTwo, playerThree, playerFour);
-
+// Player.prototype.roll = function(){
+//     var roll = (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1);
+//     console.log(roll);
+//     return roll;
+// };
 game.wall.shuffle();
-// game.wall.dealTiles();
-// game.players[0].sortHand();
-
-// // sort command
-// // wall.sort(sortBy('suit', sortBy('value')))
