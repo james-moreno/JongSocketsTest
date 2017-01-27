@@ -3,22 +3,24 @@
     <head>
         <meta charset="utf-8">
         <title>JongTest</title>
+        <link rel="icon" href="/favicon.ico?v=2" />
         <link rel="stylesheet" href="/styles.css" media="screen" title="no title">
     </head>
     <body>
         <div ng-controller="testController">
             <p>Discards:
-                <span class="hand ng-class: tile" ng-repeat="tile in discards">{{tile.suit}} {{tile.value}}</span>
+                <span ng-show="discards" class="hand ng-class: tile" ng-repeat="tile in discards">{{tile.suit}} {{tile.value}}</span>
             </p>
             <p>Most Recent Discard:
-                <span class="hand ng-class: tile" ng-click="pickup()">{{discarded.suit}} {{discarded.value}}</span>
+                <span ng-show="discarded" class="hand ng-class: tile" ng-click="pickup()">{{discarded.suit}} {{discarded.value}}</span>
             </p>
             <p>Your Tiles:
                 <ul>
                     <li ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">{{tile.value}} {{tile.suit}}</li>
                 </ul>
             </p>
-            <button ng-hide="gameStarted" ng-click="startGame()">Start Game</button>
+            <p>Players Connected: {{players}}</p>
+            <button ng-show="gameFull()" ng-click="startGame()">Start Game</button>
         </div>
         <script type ="text/javascript" src="socket.io/socket.io.js"></script>
         <script type="text/javascript" src="angular/angular.js"></script>

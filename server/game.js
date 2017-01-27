@@ -28,7 +28,7 @@ function nextTurn(){
 
 game.discard = function(data){
     var tile = game.players[data.playerID-1].hand.splice(data.tileIndex, 1);
-    if(game.discarded === undefined){
+    if(game.discarded === null){
         game.discarded = tile[0];
     }
     else {

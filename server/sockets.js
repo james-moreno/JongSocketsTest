@@ -33,6 +33,7 @@ var webSocket = function(server){
         var playerID = giveID(socket.id);
         socket.emit('giveID', playerID);
         game.addPlayer(playerID);
+        io.sockets.emit('playersUpdate', clients.length);
         socket.on('startGame', function(data){
             socket.emit('gameStarting');
             game.startGame();
