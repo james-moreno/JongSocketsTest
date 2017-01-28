@@ -25,23 +25,33 @@ var webSocket = function(server){
             game.players[idx].sortHand();
             hand = game.players[idx].hand;
             socket = clients[idx].socketID;
-            io.to(socket).emit('dealTiles', hand);
+            io.to(socket).emit('sendTiles', hand);
         }
     };
-    var turnChange = function(){
-        return;
+    var turnUpdate = function(){
+        var turn = {
+            turn: game.turn
+        };
+        io.sockets.emit("turnUpdate", turn);
     };
-    var checkTurn = function(sid){
-        for(var idx = 0; idx < clients.length; idx++){
-            if(clients[idx].socketID == sid){
-                var player = clients[idx].playerID;
-                console.log('hi');
-                return game.players[clients[idx].playerID].turn;
-            }
-            else{
-                console.log('no');
-            }
-        }
+    // var checkTurn = function(sid){
+    //     for(var idx = 0; idx < clients.length; idx++){
+    //         if(clients[idx].socketID == sid){
+    //             var player = clients[idx].playerID;
+    //             console.log('hi');
+    //             return game.players[clients[idx].playerID].turn;
+    //         }
+    //         else{
+    //             console.log('no');
+    //         }
+    //     }
+    // };
+    var discardUpdate = function(){
+        var discards = {
+            discards: game.discards,
+            discarded: game.discarded
+        };
+        io.sockets.emit('discardUpdate', discards);
     };
 
     var io = require('socket.io').listen(server);
@@ -55,28 +65,23 @@ var webSocket = function(server){
             socket.emit('gameStarting');
             game.startGame();
             sendTiles();
+            turnUpdate();
         });
         socket.on('discardTile', function(data){
             game.discard(data);
             sendTiles();
-            var discards = {
-                discards: game.discards,
-                discarded: game.discarded
-            };
-            io.sockets.emit('discardUpdate', discards);
+            discardUpdate();
+            game.nextTurn();
+            turnUpdate();
         });
         socket.on('pickup', function(data){
             game.pickup(data);
-            var discards = {
-                discards: game.discards,
-                discarded: game.discarded
-            };
             sendTiles();
-            io.sockets.emit('discardUpdate', discards);
+            discardUpdate();
         });
-        socket.on('checkTurn', function(){
-            var check = checkTurn(socket.id);
-        });
+        // socket.on('checkTurn', function(){
+        //     var check = checkTurn(socket.id);
+        // });
     });
     return io;
 };

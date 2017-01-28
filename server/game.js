@@ -16,17 +16,17 @@ game.addPlayer = function(playerID){
 };
 
  game.startGame = function(){
-     game.started = true;
-     game.wall.dealTiles();
+     if(!game.started){
+         game.started = true;
+         game.wall.dealTiles();
+     }
+     game.players[game.turn].turn = true;
 };
 
 game.nextTurn = function(){
-    if(game.turn >= 3){
-        game.turn = 0;
-    }
-    else {
-        game.turn++;
-    }
+    game.players[game.turn].turn = false;
+    game.turn = (game.turn+1)%4;
+    game.players[game.turn].turn = true;
 };
 
 game.discard = function(data){
