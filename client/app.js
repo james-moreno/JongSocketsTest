@@ -8,12 +8,14 @@ app.factory('gameSocket', function (socketFactory){
     jongSocket.forward('dealTiles');
     jongSocket.forward('discardUpdate');
     jongSocket.forward('playersUpdate');
+    jongSocket.forward('check');
     return jongSocket;
 });
 
 app.controller('testController', ['$scope', 'gameSocket', function($scope, gameSocket) {
 
 //socket stuff
+    $scope.yourTurn = false;
     $scope.gameFull = function(){
         if($scope.gameStarted === true){
             return false;
@@ -25,6 +27,9 @@ app.controller('testController', ['$scope', 'gameSocket', function($scope, gameS
             return false;
         }
     };
+    $scope.$on('socket:yourTurn', function(event){
+        $scope.yourTurn = true;
+    });
     $scope.$on('socket:giveID', function(event, data){
         $scope.playerID = data;
     });
@@ -40,11 +45,18 @@ app.controller('testController', ['$scope', 'gameSocket', function($scope, gameS
         $scope.hand = data;
     });
     $scope.discard = function(index){
-        var discardData = {
-            tileIndex: index,
-            playerID: $scope.playerID
-        };
-        gameSocket.emit('discardTile', discardData);
+        gameSocket.emit('checkTurn');
+        $scope.$on('socket: check', function(event, check) {
+
+        });
+        if(true){
+            var discardData = {
+                tileIndex: index,
+                playerID: $scope.playerID
+            };
+            gameSocket.emit('discardTile', discardData);
+            $scope.yourTurn = false;
+        }
     };
     $scope.$on('socket:discardUpdate', function(event, discards){
         $scope.discards = discards.discards;

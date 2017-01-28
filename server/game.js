@@ -5,6 +5,9 @@ game.wall = new Wall();
 game.discards = [];
 game.discarded = null;
 game.players = [];
+game.turn = 0;
+game.started = false;
+
 
 game.addPlayer = function(playerID){
     game.players.push(
@@ -13,11 +16,21 @@ game.addPlayer = function(playerID){
 };
 
  game.startGame = function(){
+     game.started = true;
      game.wall.dealTiles();
 };
 
+game.nextTurn = function(){
+    if(game.turn >= 3){
+        game.turn = 0;
+    }
+    else {
+        game.turn++;
+    }
+};
+
 game.discard = function(data){
-    var tile = game.players[data.playerID-1].hand.splice(data.tileIndex, 1);
+    var tile = game.players[data.playerID].hand.splice(data.tileIndex, 1);
     if(game.discarded === null){
         game.discarded = tile[0];
     }
@@ -29,7 +42,7 @@ game.discard = function(data){
 
 game.pickup = function(data){
     if(game.discarded){
-        game.players[data.playerID-1].hand.push(game.discarded);
+        game.players[data.playerID].hand.push(game.discarded);
         game.discarded = null;
     }
 };
@@ -75,6 +88,7 @@ Wall.prototype.shuffle = function(){
 };
 
 Wall.prototype.dealTiles = function(){
+    game.wall.shuffle();
     for(var j = 0; j < 4; j ++){
         for(var idx = 0; idx < game.players.length; idx++){
             for(var i = 1; i <= 4; i++){
@@ -89,6 +103,7 @@ Wall.prototype.dealTiles = function(){
 function Player(playerID){
     this.name = playerID;
     this.hand = [];
+    this.draw = [];
     this.turn = false;
 }
 Player.prototype.drawTile = function(){
@@ -124,4 +139,3 @@ Player.prototype.sortHand = function(){
 //     console.log(roll);
 //     return roll;
 // };
-game.wall.shuffle();

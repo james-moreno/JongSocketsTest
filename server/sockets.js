@@ -2,8 +2,9 @@ var webSocket = function(server){
 
     var game = require('./game.js');
 
-    var ids = [1,2,3,4];
+    var ids = [0,1,2,3];
     var clients = [];
+
 
     var giveID = function(socketID){
         if(ids.length > 0){
@@ -25,6 +26,21 @@ var webSocket = function(server){
             hand = game.players[idx].hand;
             socket = clients[idx].socketID;
             io.to(socket).emit('dealTiles', hand);
+        }
+    };
+    var turnChange = function(){
+        return;
+    };
+    var checkTurn = function(sid){
+        for(var idx = 0; idx < clients.length; idx++){
+            if(clients[idx].socketID == sid){
+                var player = clients[idx].playerID;
+                console.log('hi');
+                return game.players[clients[idx].playerID].turn;
+            }
+            else{
+                console.log('no');
+            }
         }
     };
 
@@ -58,10 +74,12 @@ var webSocket = function(server){
             sendTiles();
             io.sockets.emit('discardUpdate', discards);
         });
+        socket.on('checkTurn', function(){
+            var check = checkTurn(socket.id);
+        });
     });
     return io;
 };
-
 
 
 module.exports = function(appServer) {
