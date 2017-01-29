@@ -19,14 +19,20 @@ game.addPlayer = function(playerID){
      if(!game.started){
          game.started = true;
          game.wall.dealTiles();
+         game.giveTile();
+         game.players[game.turn].turn = true;
      }
-     game.players[game.turn].turn = true;
 };
 
 game.nextTurn = function(){
     game.players[game.turn].turn = false;
     game.turn = (game.turn+1)%4;
     game.players[game.turn].turn = true;
+    game.giveTile();
+};
+
+game.giveTile = function(){
+    game.players[game.turn].hand.push(game.wall.drawTile());
 };
 
 game.discard = function(data){
@@ -37,6 +43,15 @@ game.discard = function(data){
     else {
         game.discards.push(game.discarded);
         game.discarded = tile[0];
+    }
+    return game.checkHands(tile[0]);
+};
+
+game.checkHands = function(tile){
+    for(var i = 0; i < game.players.length; i++){
+        if(game.players[i].checkPung(tile)) {
+            return i;
+        }
     }
 };
 
@@ -69,7 +84,7 @@ function Wall() {
         this.wall[this.wall.length] = new Tile("dwest", null);
         this.wall[this.wall.length] = new Tile("emiddle", null);
         this.wall[this.wall.length] = new Tile("eprosperity", null);
-        this.wall[this.wall.length] = new Tile("ewhite", j);
+        this.wall[this.wall.length] = new Tile("ewhite", null);
         this.wall[this.wall.length] = new Tile("flower", j);
         this.wall[this.wall.length] = new Tile("season", j);
     }
@@ -86,7 +101,6 @@ Wall.prototype.shuffle = function(){
     }
     return this.wall;
 };
-
 Wall.prototype.dealTiles = function(){
     game.wall.shuffle();
     for(var j = 0; j < 4; j ++){
@@ -97,6 +111,11 @@ Wall.prototype.dealTiles = function(){
         }
     }
 };
+Wall.prototype.drawTile = function(){
+    return this.wall.pop();
+};
+
+
 
 
 //Player Class
@@ -133,6 +152,21 @@ return function (o, p) {
 };
 Player.prototype.sortHand = function(){
     this.hand.sort(this.sortBy('suit', this.sortBy('value')));
+};
+Player.prototype.checkPung = function(tile){
+    console.log(tile);
+    var count = 0;
+    for(var idx = 0; idx < this.hand.length; idx++){
+        if(this.hand[idx].suit == tile.suit && this.hand[idx].value == tile.value){
+            count++;
+        }
+    }
+    if (count == 2) {
+        return true;
+    }
+    else {
+        return false;
+    }
 };
 // Player.prototype.roll = function(){
 //     var roll = (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1);

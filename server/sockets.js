@@ -53,6 +53,11 @@ var webSocket = function(server){
         };
         io.sockets.emit('discardUpdate', discards);
     };
+    var canTake = function(player){
+        if(player){
+            io.to(clients[player].socketID).emit('canTake');
+        }
+    };
 
     var io = require('socket.io').listen(server);
 
@@ -68,11 +73,12 @@ var webSocket = function(server){
             turnUpdate();
         });
         socket.on('discardTile', function(data){
-            game.discard(data);
-            sendTiles();
+            var player = game.discard(data);
+            canTake(player);
             discardUpdate();
             game.nextTurn();
             turnUpdate();
+            sendTiles();
         });
         socket.on('pickup', function(data){
             game.pickup(data);
