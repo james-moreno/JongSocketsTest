@@ -32,7 +32,7 @@ game.nextTurn = function(){
 };
 
 game.giveTile = function(){
-    game.players[game.turn].hand.push(game.wall.drawTile());
+    game.players[game.turn].draw.push(game.wall.drawTile());
 };
 
 game.discard = function(data){
@@ -74,8 +74,8 @@ function Wall() {
     this.wall = [];
     for(var j = 1; j <= 4; j++){
         for(var i = 1; i <= 9; i++){
-            this.wall[this.wall.length] = new Tile('bamboo', i);
             this.wall[this.wall.length] = new Tile('aspot', i);
+            this.wall[this.wall.length] = new Tile('bamboo', i);
             this.wall[this.wall.length] = new Tile('char', i);
         }
         this.wall[this.wall.length] = new Tile("dnorth", null);

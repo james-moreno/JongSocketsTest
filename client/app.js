@@ -42,7 +42,8 @@ app.controller('testController', ['$scope', 'gameSocket', function($scope, gameS
     });
     $scope.$on('socket:sendTiles', function(event, data) {
         $scope.gameStarted = true;
-        $scope.hand = data;
+        $scope.hand = data.hand;
+        $scope.draw = data.draw;
     });
     $scope.discard = function(index){
         if($scope.yourTurn){

@@ -23,9 +23,12 @@ var webSocket = function(server){
         var hand;
         for(var idx = 0; idx < clients.length; idx++){
             game.players[idx].sortHand();
-            hand = game.players[idx].hand;
+            handData = {
+                hand : game.players[idx].hand,
+                draw : game.players[idx].draw[0]
+            };
             socket = clients[idx].socketID;
-            io.to(socket).emit('sendTiles', hand);
+            io.to(socket).emit('sendTiles', handData);
         }
     };
     var turnUpdate = function(){

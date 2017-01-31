@@ -17,10 +17,11 @@
             <h3 ng-show="yourTurn">Your turn!</h3>
             <button ng-show="canPick" ng-click="pickup()">Pung!</button>
             <p>Your Tiles:
-                <ul>
-                    <li ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">{{tile.value}} {{tile.suit}}</li>
-                </ul>
+                <div id="hand">
+                    <div ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">{{tile.value}} {{tile.suit}}</div>
+                </div>
             </p>
+            <p ng-show="yourTurn">Your Draw: <div ng-show="yourTurn" class="tile">{{draw.suit}} {{draw.value}}</div></p>
             <p>Players Connected: {{players}}</p>
             <button ng-show="gameFull()" ng-click="startGame()">Start Game</button>
         </div>
