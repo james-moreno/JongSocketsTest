@@ -21,7 +21,7 @@
                     <div ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">{{tile.value}} {{tile.suit}}</div>
                 </div>
             </p>
-            <p ng-show="yourTurn">Your Draw: <div ng-show="yourTurn" class="tile">{{draw.suit}} {{draw.value}}</div></p>
+            <p ng-show="yourTurn">Your Draw: <div ng-click="discard(draw)" ng-show="yourTurn" class="tile">{{draw.suit}} {{draw.value}}</div></p>
             <p>Players Connected: {{players}}</p>
             <button ng-show="gameFull()" ng-click="startGame()">Start Game</button>
         </div>

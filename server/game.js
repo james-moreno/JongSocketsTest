@@ -36,15 +36,29 @@ game.giveTile = function(){
 };
 
 game.discard = function(data){
-    var tile = game.players[data.playerID].hand.splice(data.tileIndex, 1);
-    if(game.discarded === null){
-        game.discarded = tile[0];
+    if(data.suit){
+        var tile = game.players[data.playerID].draw.pop();
+        if(game.discarded === null){
+            game.discarded = tile;
+        }
+        else {
+            game.discards.push(game.discarded);
+            game.discarded = tile;
+        }
+        return game.checkHands(tile);
     }
     else {
-        game.discards.push(game.discarded);
-        game.discarded = tile[0];
+        var handTile = game.players[data.playerID].hand.splice(data.tileIndex, 1);
+        if(game.discarded === null){
+            game.discarded = handTile[0];
+        }
+        else {
+            game.discards.push(game.discarded);
+            game.discarded = handTile[0];
+        }
+        game.players[data.playerID].hand.push(game.players[data.playerID].draw.pop());
+        return game.checkHands(handTile[0]);
     }
-    return game.checkHands(tile[0]);
 };
 
 game.checkHands = function(tile){
@@ -154,7 +168,6 @@ Player.prototype.sortHand = function(){
     this.hand.sort(this.sortBy('suit', this.sortBy('value')));
 };
 Player.prototype.checkPung = function(tile){
-    console.log(tile);
     var count = 0;
     for(var idx = 0; idx < this.hand.length; idx++){
         if(this.hand[idx].suit == tile.suit && this.hand[idx].value == tile.value){

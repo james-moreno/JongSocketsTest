@@ -46,7 +46,12 @@ app.controller('testController', ['$scope', 'gameSocket', function($scope, gameS
         $scope.draw = data.draw;
     });
     $scope.discard = function(index){
-        if($scope.yourTurn){
+        if(typeof(index) == 'object'){
+            index.playerID = $scope.playerID;
+            gameSocket.emit('discardTile', index);
+            $scope.yourTurn = false;
+        }
+        if($scope.yourTurn && typeof(index) == 'number'){
             var discardData = {
                 tileIndex: index,
                 playerID: $scope.playerID
