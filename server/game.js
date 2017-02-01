@@ -45,7 +45,8 @@ game.discard = function(data){
             game.discards.push(game.discarded);
             game.discarded = tile;
         }
-        return game.checkHands(tile);
+        game.checkEats(tile);
+        return game.checkPungs(tile);
     }
     else {
         var handTile = game.players[data.playerID].hand.splice(data.tileIndex, 1);
@@ -57,15 +58,25 @@ game.discard = function(data){
             game.discarded = handTile[0];
         }
         game.players[data.playerID].hand.push(game.players[data.playerID].draw.pop());
-        return game.checkHands(handTile[0]);
+        game.checkEats(handTile[0]);
+        return game.checkPungs(handTile[0]);
     }
 };
 
-game.checkHands = function(tile){
+game.checkPungs = function(tile){
     for(var i = 0; i < game.players.length; i++){
         if(game.players[i].checkPung(tile)) {
             return i;
         }
+    }
+};
+
+game.checkEats = function(tile){
+    if(game.turn == 3){
+        game.players[0].checkEat(tile);
+    }
+    else{
+        game.players[game.turn+1].checkEat(tile);
     }
 };
 
@@ -179,6 +190,30 @@ Player.prototype.checkPung = function(tile){
     }
     else {
         return false;
+    }
+};
+Player.prototype.checkEat = function(tile){
+    for(var idx = 0; idx < this.hand.length; idx++){
+        if(tile.value-1 == this.hand[idx].value){
+            if(this.hand[idx-1] && tile.value-2 == this.hand[idx-1].value){
+                console.log('low set');
+                console.log(this.hand[idx-1].value, this.hand[idx].value, tile.value);
+            }
+            else if(this.hand[idx+1] && tile.value+1 == this.hand[idx+1].value){
+                console.log('mid set');
+                console.log(this.hand[idx].value, tile.value, this.hand[idx+1].value);
+                if(this.hand[idx+2] && tile.value+2 == this.hand[idx+2].value){
+                    console.log('high set');
+                    console.log(tile.value, this.hand[idx+1].value, this.hand[idx+2].value);
+                }
+            }
+        }
+        else if (this.hand[idx+1] && tile.value+1 == this.hand[idx+1].value){
+            if(this.hand[idx+2] && tile.value+2 == this.hand[idx+2].value){
+                console.log('high set');
+                console.log(tile.value, this.hand[idx+1].value, this.hand[idx+2].value);
+            }
+        }
     }
 };
 // Player.prototype.roll = function(){
