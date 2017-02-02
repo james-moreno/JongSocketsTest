@@ -56,9 +56,17 @@ var webSocket = function(server){
         };
         io.sockets.emit('discardUpdate', discards);
     };
-    var canTake = function(player){
+    var canPung = function(player){
         if(player){
-            io.to(clients[player].socketID).emit('canTake');
+            io.to(clients[player].socketID).emit('canPung');
+        }
+    };
+    var canEat = function(eats){
+        if(game.turn == 3){
+            io.to(clients[0].socketID).emit('canEat', eats);
+        }
+        else {
+            io.to(clients[game.turn+1].socketID).emit('canEat', eats);
         }
     };
 
@@ -77,7 +85,8 @@ var webSocket = function(server){
         });
         socket.on('discardTile', function(data){
             var player = game.discard(data);
-            canTake(player);
+            canPung(player.pung);
+            canEat(player.eats);
             discardUpdate();
             game.nextTurn();
             turnUpdate();

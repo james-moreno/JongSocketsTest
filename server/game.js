@@ -45,8 +45,11 @@ game.discard = function(data){
             game.discards.push(game.discarded);
             game.discarded = tile;
         }
-        game.checkEats(tile);
-        return game.checkPungs(tile);
+        var actions = {
+            eats: game.checkEats(tile),
+            pung: game.checkPungs(tile)
+        };
+        return actions;
     }
     else {
         var handTile = game.players[data.playerID].hand.splice(data.tileIndex, 1);
@@ -58,8 +61,11 @@ game.discard = function(data){
             game.discarded = handTile[0];
         }
         game.players[data.playerID].hand.push(game.players[data.playerID].draw.pop());
-        game.checkEats(handTile[0]);
-        return game.checkPungs(handTile[0]);
+        var actions = {
+            eats: game.checkEats(handTile[0]),
+            pung: game.checkPungs(handTile[0])
+        };
+        return actions;
     }
 };
 
@@ -73,10 +79,10 @@ game.checkPungs = function(tile){
 
 game.checkEats = function(tile){
     if(game.turn == 3){
-        game.players[0].checkEat(tile);
+        return game.players[0].checkEat(tile);
     }
     else{
-        game.players[game.turn+1].checkEat(tile);
+        return game.players[game.turn+1].checkEat(tile);
     }
 };
 

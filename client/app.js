@@ -8,7 +8,8 @@ app.factory('gameSocket', function (socketFactory){
     jongSocket.forward('discardUpdate');
     jongSocket.forward('playersUpdate');
     jongSocket.forward('turnUpdate');
-    jongSocket.forward('canTake');
+    jongSocket.forward('canPung');
+    jongSocket.forward('canEat');
     return jongSocket;
 });
 
@@ -64,8 +65,11 @@ app.controller('testController', ['$scope', 'gameSocket', function($scope, gameS
         $scope.discards = discards.discards;
         $scope.discarded = discards.discarded;
     });
-    $scope.$on('socket:canTake', function(event){
+    $scope.$on('socket:canPung', function(event){
         $scope.canPick = true;
+    });
+    $scope.$on('socket:canEat', function(event, eats){
+        console.log(eats);
     });
     $scope.$on('socket:turnUpdate', function(event, data){
         if($scope.playerID == data.turn){
