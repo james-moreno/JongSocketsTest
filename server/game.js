@@ -193,26 +193,42 @@ Player.prototype.checkPung = function(tile){
     }
 };
 Player.prototype.checkEat = function(tile){
+    var runs = [];
     for(var idx = 0; idx < this.hand.length; idx++){
-        if(tile.value-1 == this.hand[idx].value){
-            if(this.hand[idx-1] && tile.value-2 == this.hand[idx-1].value){
-                console.log('low set');
-                console.log(this.hand[idx-1].value, this.hand[idx].value, tile.value);
+        if(tile.value-1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
+            if(this.hand[idx-1] && tile.value-2 == this.hand[idx-1].value && tile.suit == this.hand[idx-1].suit){
+                runs.push(this.hand[idx-1], this.hand[idx], tile);
             }
-            else if(this.hand[idx+1] && tile.value+1 == this.hand[idx+1].value){
-                console.log('mid set');
-                console.log(this.hand[idx].value, tile.value, this.hand[idx+1].value);
-                if(this.hand[idx+2] && tile.value+2 == this.hand[idx+2].value){
-                    console.log('high set');
-                    console.log(tile.value, this.hand[idx+1].value, this.hand[idx+2].value);
+            if(this.hand[idx+1] && tile.value+1 == this.hand[idx+1].value && tile.suit == this.hand[idx+1].suit){
+                if(!this.hasValue(runs, this.hand[idx].value)){
+                    runs.push(this.hand[idx]);
+                }
+                if(!this.hasValue(runs, tile.value)){
+                    runs.push(tile);
+                }
+                if(!this.hasValue(runs, this.hand[idx+1].value)){
+                    runs.push(this.hand[idx+1]);
+                }
+                if(this.hand[idx+2] && tile.value+2 == this.hand[idx+2].value && tile.suit == this.hand[idx+2].suit){
+                    if(!this.hasValue(runs, this.hand[idx+2].value)){
+                        runs.push(this.hand[idx+2]);
+                    }
+                    break;
                 }
             }
         }
-        else if (this.hand[idx+1] && tile.value+1 == this.hand[idx+1].value){
-            if(this.hand[idx+2] && tile.value+2 == this.hand[idx+2].value){
-                console.log('high set');
-                console.log(tile.value, this.hand[idx+1].value, this.hand[idx+2].value);
+        else if (tile.value+1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
+            if(this.hand[idx+1] && tile.value+2 == this.hand[idx+1].value && tile.suit == this.hand[idx].suit){
+                runs.push(tile, this.hand[idx], this.hand[idx+1]);
             }
+        }
+    }
+    return runs;
+};
+Player.prototype.hasValue = function(arr, value){
+    for(var idx = 0; idx < arr.length ; idx++){
+        if(arr[idx].value == value){
+            return true;
         }
     }
 };
