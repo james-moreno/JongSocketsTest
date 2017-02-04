@@ -1,4 +1,4 @@
-var webSocket = function(server){
+var webSocket = function(client){
 
     var game = require('./game.js');
 
@@ -70,7 +70,13 @@ var webSocket = function(server){
         }
     };
 
-    var io = require('socket.io').listen(server);
+    var io = require('socket.io').listen(client);
+
+    io.use(function(client, next) {
+    var handshakeData = client.request;
+        console.log(handshakeData.headers.cookie);
+        next();
+    });
 
     io.sockets.on('connection', function (socket) {
         var playerID = giveID(socket.id);

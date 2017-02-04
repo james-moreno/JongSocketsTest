@@ -68,7 +68,7 @@ game.discard = function(data){
         return actions;
     }
 };
-
+// Checking arbitrary order because only possible pung
 game.checkPungs = function(tile){
     for(var i = 0; i < game.players.length; i++){
         if(game.players[i].checkPung(tile)) {
@@ -78,12 +78,8 @@ game.checkPungs = function(tile){
 };
 
 game.checkEats = function(tile){
-    if(game.turn == 3){
-        return game.players[0].checkEat(tile);
-    }
-    else{
-        return game.players[game.turn+1].checkEat(tile);
-    }
+    var nextPlayer = (game.turn+1)%4;
+    return game.players[nextPlayer].checkEat(tile);
 };
 
 game.pickup = function(data){
