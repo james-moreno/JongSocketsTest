@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="/styles.css" media="screen" title="no title">
     </head>
     <body>
-        <div ng-controller="testController">
+        <div ng-controller="testController" ng-show="gameNotFull()">
             <p>Discards:
                 <span ng-show="discards" class="hand ng-class: tile" ng-repeat="tile in discards">{{tile.suit}} {{tile.value}}</span>
             </p>
@@ -23,11 +23,12 @@
             </p>
             <p ng-show="yourTurn">Your Draw: <div ng-click="discard(draw)" ng-show="yourTurn" class="tile">{{draw.suit}} {{draw.value}}</div></p>
             <p>Players Connected: {{players}}</p>
-            <button ng-show="gameFull()" ng-click="startGame()">Start Game</button>
+            <button ng-show="gameFullNotStarted(players)" ng-click="startGame()">Start Game</button>
         </div>
         <script type ="text/javascript" src="socket.io/socket.io.js"></script>
         <script type="text/javascript" src="angular/angular.js"></script>
         <script type="text/javascript" src="angular-socket-io/socket.js"></script>
+        <script src="angular-cookies/angular-cookies.js"></script>
         <script type="text/javascript" src="app.js"></script>
     </body>
 </html>

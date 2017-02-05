@@ -1,19 +1,20 @@
 var webSocket = function(client){
 
     var game = require('./game.js');
+    var sha1 = require('../node_modules/sha1');
 
     var ids = [0,1,2,3];
     var clients = [];
-
 
     var giveID = function(socketID){
         if(ids.length > 0){
             var id = ids.splice(0, 1);
             clients.push({
-                playerID: id[0],
+                position: id[0],
+                playerID: sha1(socketID),
                 socketID: socketID
             });
-            return id[0];
+            return clients[id[0]];
         }
         else {
             return;
@@ -69,20 +70,51 @@ var webSocket = function(client){
             io.to(clients[game.turn+1].socketID).emit('canEat', eats);
         }
     };
+    var existingPlayer = function(cookie){
+        for(var idx = 0; idx < clients.length; idx++){
+            if(cookie == clients[idx].playerID){
+                return idx;
+            }
+        }
+        return false;
+    };
+
+    var checkCookie = function(cookie, socket){
+        var exists = existingPlayer(cookie);
+        console.log(exists);
+        if(typeof(exists) == 'number') {
+            clients[exists].socketID = socket.id;
+            if(game.started){
+                discardUpdate();
+                turnUpdate();
+                sendTiles();
+            }
+            socket.emit('playersUpdate', clients.length);
+        }
+        if(cookie === undefined || cookie === null){
+            if(clients.length > 4){
+                console.log('game is full');
+            }
+            else if(clients.length < 4){
+                console.log('player joined');
+                var player = giveID(socket.id);
+                var playerInfo = {
+                    position: player.position,
+                    playerID: player.playerID
+                };
+                socket.emit('giveID', playerInfo);
+                game.addPlayer(playerInfo.position);
+                io.sockets.emit('playersUpdate', clients.length);
+            }
+        }
+    };
 
     var io = require('socket.io').listen(client);
 
-    io.use(function(client, next) {
-    var handshakeData = client.request;
-        console.log(handshakeData.headers.cookie);
-        next();
-    });
-
     io.sockets.on('connection', function (socket) {
-        var playerID = giveID(socket.id);
-        socket.emit('giveID', playerID);
-        game.addPlayer(playerID);
-        io.sockets.emit('playersUpdate', clients.length);
+        socket.on('cookieData', function(data){
+            checkCookie(data, socket);
+        });
         socket.on('startGame', function(data){
             socket.emit('gameStarting');
             game.startGame();

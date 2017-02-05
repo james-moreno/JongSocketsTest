@@ -9,9 +9,9 @@ game.turn = 0;
 game.started = false;
 
 
-game.addPlayer = function(playerID){
+game.addPlayer = function(position){
     game.players.push(
-        new Player(playerID)
+        new Player(position)
     );
 };
 

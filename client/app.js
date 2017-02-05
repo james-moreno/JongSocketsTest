@@ -1,4 +1,4 @@
-var app = angular.module('app', ['btford.socket-io']);
+var app = angular.module('app', ['ngCookies', 'btford.socket-io']);
 
 app.factory('gameSocket', function (socketFactory){
     var jongSocket = socketFactory();
@@ -13,33 +13,38 @@ app.factory('gameSocket', function (socketFactory){
     return jongSocket;
 });
 
-app.controller('testController', ['$scope', 'gameSocket', function($scope, gameSocket) {
+app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function($scope, $cookies, gameSocket) {
 
 //socket stuff
+    var user_cookie = $cookies.get('jongCookie');
+    gameSocket.emit('cookieData', user_cookie);
     $scope.yourTurn = false;
     $scope.canPick = false;
-    $scope.gameFull = function(){
-        if($scope.gameStarted === true){
-            return false;
-        }
-        else if($scope.players > 3){
+    $scope.gameStarted = false;
+
+    $scope.gameFullNotStarted = function(players){
+        if(players == 4 && $scope.gameStarted === false){
             return true;
         }
-        else{
-            return false;
-        }
+        return false;
     };
+
     $scope.$on('socket:yourTurn', function(event){
         $scope.yourTurn = true;
     });
     $scope.$on('socket:giveID', function(event, data){
-        $scope.playerID = data;
+        $scope.playerID = data.playerID;
+        $scope.position = data.position;
+        $cookies.put('jongCookie', $scope.playerID);
     });
     $scope.startGame = function(){
         gameSocket.emit('startGame');
     };
     $scope.$on('socket:playersUpdate', function(event, data){
         $scope.players = data;
+        console.log($scope.players);
+        console.log($scope.gameFullNotStarted($scope.players));
+        $scope.gameFullNotStarted(data);
     });
     $scope.$on('socket:sendTiles', function(event, data) {
         $scope.gameStarted = true;
@@ -48,7 +53,7 @@ app.controller('testController', ['$scope', 'gameSocket', function($scope, gameS
     });
     $scope.discard = function(index){
         if(typeof(index) == 'object'){
-            index.playerID = $scope.playerID;
+            index.playerID = $scope.position;
             gameSocket.emit('discardTile', index);
             $scope.yourTurn = false;
         }
@@ -72,13 +77,13 @@ app.controller('testController', ['$scope', 'gameSocket', function($scope, gameS
         console.log(eats);
     });
     $scope.$on('socket:turnUpdate', function(event, data){
-        if($scope.playerID == data.turn){
+        if($scope.position == data.turn){
             $scope.yourTurn = true;
         }
     });
     $scope.pickup = function(){
         var data = {
-            playerID: $scope.playerID
+            playerID: $scope.position
         };
         gameSocket.emit('pickup', data);
         $scope.canPick = false;

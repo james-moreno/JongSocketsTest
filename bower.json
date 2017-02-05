@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "angular": "^1.6.1",
-    "angular-socket-io": "^0.7.0"
+    "angular-socket-io": "^0.7.0",
+    "angular-cookies": "^1.6.1"
   }
 }
