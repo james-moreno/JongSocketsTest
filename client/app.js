@@ -10,6 +10,7 @@ app.factory('gameSocket', function (socketFactory){
     jongSocket.forward('turnUpdate');
     jongSocket.forward('canPung');
     jongSocket.forward('canEat');
+    jongSocket.forward('timerUpdate');
     return jongSocket;
 });
 
@@ -21,6 +22,11 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     $scope.yourTurn = false;
     $scope.canPick = false;
     $scope.gameStarted = false;
+    $scope.timer = undefined;
+
+    $scope.$on('socket:timerUpdate', function(event, time){
+        $scope.timer = time;
+    });
 
     $scope.gameFullNotStarted = function(players){
         if(players == 4 && $scope.gameStarted === false){
@@ -42,8 +48,6 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     };
     $scope.$on('socket:playersUpdate', function(event, data){
         $scope.players = data;
-        console.log($scope.players);
-        console.log($scope.gameFullNotStarted($scope.players));
         $scope.gameFullNotStarted(data);
     });
     $scope.$on('socket:sendTiles', function(event, data) {
@@ -53,14 +57,14 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     });
     $scope.discard = function(index){
         if(typeof(index) == 'object'){
-            index.playerID = $scope.position;
+            index.position = $scope.position;
             gameSocket.emit('discardTile', index);
             $scope.yourTurn = false;
         }
         if($scope.yourTurn && typeof(index) == 'number'){
             var discardData = {
                 tileIndex: index,
-                playerID: $scope.playerID
+                position: $scope.position
             };
             gameSocket.emit('discardTile', discardData);
             $scope.yourTurn = false;
@@ -83,7 +87,7 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     });
     $scope.pickup = function(){
         var data = {
-            playerID: $scope.position
+            position: $scope.position
         };
         gameSocket.emit('pickup', data);
         $scope.canPick = false;

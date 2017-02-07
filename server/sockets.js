@@ -57,11 +57,13 @@ var webSocket = function(client){
         };
         io.sockets.emit('discardUpdate', discards);
     };
+
     var canPung = function(player){
-        if(player){
+        if(typeof(player) == "number"){
             io.to(clients[player].socketID).emit('canPung');
         }
     };
+
     var canEat = function(eats){
         if(game.turn == 3){
             io.to(clients[0].socketID).emit('canEat', eats);
@@ -70,6 +72,7 @@ var webSocket = function(client){
             io.to(clients[game.turn+1].socketID).emit('canEat', eats);
         }
     };
+
     var existingPlayer = function(cookie){
         for(var idx = 0; idx < clients.length; idx++){
             if(cookie == clients[idx].playerID){
@@ -81,7 +84,6 @@ var webSocket = function(client){
 
     var checkCookie = function(cookie, socket){
         var exists = existingPlayer(cookie);
-        console.log(exists);
         if(typeof(exists) == 'number') {
             clients[exists].socketID = socket.id;
             if(game.started){
@@ -112,6 +114,7 @@ var webSocket = function(client){
     var io = require('socket.io').listen(client);
 
     io.sockets.on('connection', function (socket) {
+        var pickupActive = false;
         socket.on('cookieData', function(data){
             checkCookie(data, socket);
         });
@@ -122,19 +125,43 @@ var webSocket = function(client){
             turnUpdate();
         });
         socket.on('discardTile', function(data){
-            var player = game.discard(data);
-            canPung(player.pung);
-            canEat(player.eats);
-            discardUpdate();
+        var actionData = game.discard(data);
+        discardUpdate();
+        if(typeof(actionData.pung) == "number" || actionData.eats.length > 1){
+            pickupActive = true;
+            if(typeof(actionData.pung) == "number"){
+                canPung(actionData.pung);
+            }
+            if(actionData.eats.length > 1){
+                canEat(actionData.eats);
+            }
+            var timer = 5;
+            var choiceTimer = setInterval(function () {
+                timer--;
+                io.sockets.emit('timerUpdate', timer);
+                if (timer === 0) {
+                    pickupActive = false;
+                    clearInterval(choiceTimer);
+                    game.nextTurn();
+                    turnUpdate();
+                    sendTiles();
+                    }
+                }, 1000);
+        }
+        else {
             game.nextTurn();
             turnUpdate();
             sendTiles();
-        });
-        socket.on('pickup', function(data){
+        }
+    });
+    socket.on('pickup', function(data){
+        if(pickupActive){
             game.pickup(data);
             sendTiles();
             discardUpdate();
-        });
+            turnUpdate();
+        }
+    });
         // socket.on('checkTurn', function(){
         //     var check = checkTurn(socket.id);
         // });

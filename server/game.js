@@ -37,7 +37,7 @@ game.giveTile = function(){
 
 game.discard = function(data){
     if(data.suit){
-        var tile = game.players[data.playerID].draw.pop();
+        var tile = game.players[data.position].draw.pop();
         if(game.discarded === null){
             game.discarded = tile;
         }
@@ -46,13 +46,12 @@ game.discard = function(data){
             game.discarded = tile;
         }
         var actions = {
-            eats: game.checkEats(tile),
-            pung: game.checkPungs(tile)
+            eats: game.checkEats(tile)
         };
         return actions;
     }
     else {
-        var handTile = game.players[data.playerID].hand.splice(data.tileIndex, 1);
+        var handTile = game.players[data.position].hand.splice(data.tileIndex, 1);
         if(game.discarded === null){
             game.discarded = handTile[0];
         }
@@ -60,7 +59,7 @@ game.discard = function(data){
             game.discards.push(game.discarded);
             game.discarded = handTile[0];
         }
-        game.players[data.playerID].hand.push(game.players[data.playerID].draw.pop());
+        game.players[data.position].hand.push(game.players[data.position].draw.pop());
         var actions = {
             eats: game.checkEats(handTile[0]),
             pung: game.checkPungs(handTile[0])
@@ -83,10 +82,12 @@ game.checkEats = function(tile){
 };
 
 game.pickup = function(data){
+    console.log(data);
     if(game.discarded){
-        game.players[data.playerID].hand.push(game.discarded);
+        game.players[data.position].hand.push(game.discarded);
         game.discarded = null;
     }
+    game.turn = data.position;
 };
 
 //Tile Class
@@ -112,8 +113,8 @@ function Wall() {
         this.wall[this.wall.length] = new Tile("emiddle", null);
         this.wall[this.wall.length] = new Tile("eprosperity", null);
         this.wall[this.wall.length] = new Tile("ewhite", null);
-        this.wall[this.wall.length] = new Tile("flower", j);
-        this.wall[this.wall.length] = new Tile("season", j);
+        // this.wall[this.wall.length] = new Tile("flower", j);
+        // this.wall[this.wall.length] = new Tile("season", j);
     }
 }
 
