@@ -16,7 +16,13 @@
             </p>
             <h3 ng-show="timer">{{timer}}</h3>
             <h3 ng-show="yourTurn">Your turn!</h3>
-            <button ng-show="canPick" ng-click="pickup()">Pung!</button>
+            <div ng-show="canPick">
+                <button ng-show="pungable" ng-click="pickup()">Pung!</button>
+                <div ng-repeat="runs in eats">
+                    <div class="hand ng-class: tile" ng-repeat="tile in runs">{{tile.value}} {{tile.suit}}</div>
+                </div>
+                <button ng-show="eatable" ng-click="pickup()">Eat!</button>
+            </div>
             <p>Your Tiles:
                 <div id="hand">
                     <div ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">{{tile.value}} {{tile.suit}}</div>

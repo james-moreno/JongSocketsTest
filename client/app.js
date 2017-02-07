@@ -21,6 +21,8 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     gameSocket.emit('cookieData', user_cookie);
     $scope.yourTurn = false;
     $scope.canPick = false;
+    $scope.pungable = false;
+    $scope.eatable = false;
     $scope.gameStarted = false;
     $scope.timer = undefined;
 
@@ -76,9 +78,18 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     });
     $scope.$on('socket:canPung', function(event){
         $scope.canPick = true;
+        $scope.pungable = true;
     });
     $scope.$on('socket:canEat', function(event, eats){
-        console.log(eats);
+        console.log('hi');
+        $scope.canPick = true;
+        $scope.eatable = true;
+        $scope.eats = [];
+        for(var idx = 2; idx < eats.length; idx++){
+            var arr = [];
+            arr.push(eats[idx-2], eats[idx-1], eats[idx]);
+            $scope.eats.push(arr);
+        }
     });
     $scope.$on('socket:turnUpdate', function(event, data){
         if($scope.position == data.turn){
