@@ -25,6 +25,11 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     $scope.eatable = false;
     $scope.gameStarted = false;
     $scope.timer = undefined;
+    $scope.eatPressed = false;
+
+    $scope.eatPress = function(){
+        $scope.eatPressed = true;
+    };
 
     $scope.$on('socket:timerUpdate', function(event, time){
         $scope.timer = time;
@@ -53,9 +58,11 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.gameFullNotStarted(data);
     });
     $scope.$on('socket:sendTiles', function(event, data) {
+
         $scope.gameStarted = true;
         $scope.hand = data.hand;
         $scope.draw = data.draw;
+        $scope.played = data.played;
     });
     $scope.discard = function(index){
         if(typeof(index) == 'object'){
@@ -81,26 +88,31 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.pungable = true;
     });
     $scope.$on('socket:canEat', function(event, eats){
-        console.log('hi');
         $scope.canPick = true;
         $scope.eatable = true;
-        $scope.eats = [];
-        for(var idx = 2; idx < eats.length; idx++){
-            var arr = [];
-            arr.push(eats[idx-2], eats[idx-1], eats[idx]);
-            $scope.eats.push(arr);
-        }
+        $scope.eats = eats;
     });
     $scope.$on('socket:turnUpdate', function(event, data){
         if($scope.position == data.turn){
             $scope.yourTurn = true;
         }
     });
-    $scope.pickup = function(){
-        var data = {
-            position: $scope.position
-        };
-        gameSocket.emit('pickup', data);
+    $scope.pickup = function(tiles){
+        if(Array.isArray(tiles)){
+            var pickupData = {
+                run: tiles,
+                position: $scope.position
+            };
+            $scope.eatable = false;
+            $scope.eatPressed = false;
+            gameSocket.emit('pickup', pickupData);
+        }
+        else {
+            var data = {
+                position: $scope.position
+            };
+            gameSocket.emit('pickup', data);
+        }
         $scope.canPick = false;
     };
 }]);

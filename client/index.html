@@ -18,14 +18,25 @@
             <h3 ng-show="yourTurn">Your turn!</h3>
             <div ng-show="canPick">
                 <button ng-show="pungable" ng-click="pickup()">Pung!</button>
-                <div ng-repeat="runs in eats">
-                    <div class="hand ng-class: tile" ng-repeat="tile in runs">{{tile.value}} {{tile.suit}}</div>
+                <button ng-show="eatable" ng-click="eatPress()">Eat!</button>
+                <div ng-repeat="runs in eats" ng-show="eatPressed" ng-click="pickup(runs)">
+                    <div class="hand ng-class: tile" ng-repeat="tile in runs">
+                        {{tile.value}} {{tile.suit}}
+                    </div>
                 </div>
-                <button ng-show="eatable" ng-click="pickup()">Eat!</button>
             </div>
             <p>Your Tiles:
                 <div id="hand">
-                    <div ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">{{tile.value}} {{tile.suit}}</div>
+                    <div ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">
+                        {{tile.value}} {{tile.suit}}
+                    </div>
+                </div>
+            </p>
+            <p>Played Tiles:
+                <div ng-repeat="runs in played">
+                    <div class="hand ng-class: tile" ng-repeat="tile in runs">
+                        {{tile.value}} {{tile.suit}}
+                    </div>
                 </div>
             </p>
             <p ng-show="yourTurn">Your Draw: <div ng-click="discard(draw)" ng-show="yourTurn" class="tile">{{draw.suit}} {{draw.value}}</div></p>

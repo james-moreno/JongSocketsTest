@@ -15,7 +15,7 @@ game.addPlayer = function(position){
     );
 };
 
- game.startGame = function(){
+game.startGame = function(){
      if(!game.started){
          game.started = true;
          game.wall.dealTiles();
@@ -36,36 +36,20 @@ game.giveTile = function(){
 };
 
 game.discard = function(data){
-    if(data.suit){
-        var tile = game.players[data.position].draw.pop();
-        if(game.discarded === null){
-            game.discarded = tile;
-        }
-        else {
-            game.discards.push(game.discarded);
-            game.discarded = tile;
-        }
-        var actions = {
-            eats: game.checkEats(tile)
-        };
-        return actions;
+    var handTile = game.players[data.position].hand.splice(data.tileIndex, 1);
+    if(game.discarded === null){
+        game.discarded = handTile[0];
     }
     else {
-        var handTile = game.players[data.position].hand.splice(data.tileIndex, 1);
-        if(game.discarded === null){
-            game.discarded = handTile[0];
-        }
-        else {
-            game.discards.push(game.discarded);
-            game.discarded = handTile[0];
-        }
-        game.players[data.position].hand.push(game.players[data.position].draw.pop());
-        var actions = {
-            eats: game.checkEats(handTile[0]),
-            pung: game.checkPungs(handTile[0])
-        };
-        return actions;
+        game.discards.push(game.discarded);
+        game.discarded = handTile[0];
     }
+    game.players[data.position].hand.push(game.players[data.position].draw.pop());
+    var actions = {
+        eats: game.checkEats(handTile[0]),
+        pung: game.checkPungs(handTile[0])
+    };
+    return actions;
 };
 // Checking arbitrary order because only possible pung
 game.checkPungs = function(tile){
@@ -82,12 +66,13 @@ game.checkEats = function(tile){
 };
 
 game.pickup = function(data){
-    console.log(data);
-    if(game.discarded){
-        game.players[data.position].hand.push(game.discarded);
-        game.discarded = null;
+    game.players[data.position].hand.push(game.discarded);
+    game.discarded = null;
+    if(Array.isArray(data.run)){
+        game.players[data.position].pickupRun(data.run);
     }
     game.turn = data.position;
+    console.log(game.players[data.position].played);
 };
 
 //Tile Class
@@ -151,6 +136,7 @@ function Player(playerID){
     this.name = playerID;
     this.hand = [];
     this.draw = [];
+    this.played = [];
     this.turn = false;
 }
 Player.prototype.drawTile = function(){
@@ -195,36 +181,62 @@ Player.prototype.checkPung = function(tile){
         return false;
     }
 };
+
+Player.prototype.lowEat = function(tile){
+    var run = [];
+    for(var idx = 0 ; idx < this.hand.length; idx ++){
+        if(tile.value-1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
+            for(var i = idx; i > -1; i--){
+                if(tile.value-2 == this.hand[i].value && tile.suit == this.hand[i].suit){
+                    run.push(this.hand[i], tile, this.hand[idx]);
+                    return run;
+                }
+            }
+        }
+    }
+    return;
+};
+Player.prototype.midEat = function(tile){
+    var run = [];
+    for(var idx = 0 ; idx < this.hand.length; idx ++){
+        if(tile.value-1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
+            for(var i = idx; i < this.hand.length; i++){
+                if(tile.value+1 == this.hand[i].value && tile.suit == this.hand[i].suit){
+                    run.push(this.hand[idx], tile, this.hand[i]);
+                    return run;
+                }
+            }
+        }
+    }
+    return;
+};
+Player.prototype.highEat = function(tile){
+    var run = [];
+    for(var idx = 0 ; idx < this.hand.length; idx ++){
+        if(tile.value+1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
+            for(var i = idx; i < this.hand.length; i++){
+                if(tile.value+2 == this.hand[i].value && tile.suit == this.hand[i].suit){
+                    run.push(this.hand[idx], tile, this.hand[i]);
+                    return run;
+                }
+            }
+        }
+    }
+    return;
+};
 Player.prototype.checkEat = function(tile){
     var runs = [];
-    for(var idx = 0; idx < this.hand.length; idx++){
-        if(tile.value-1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
-            if(this.hand[idx-1] && tile.value-2 == this.hand[idx-1].value && tile.suit == this.hand[idx-1].suit){
-                runs.push(this.hand[idx-1], this.hand[idx], tile);
-            }
-            if(this.hand[idx+1] && tile.value+1 == this.hand[idx+1].value && tile.suit == this.hand[idx+1].suit){
-                if(!this.hasValue(runs, this.hand[idx].value)){
-                    runs.push(this.hand[idx]);
-                }
-                if(!this.hasValue(runs, tile.value)){
-                    runs.push(tile);
-                }
-                if(!this.hasValue(runs, this.hand[idx+1].value)){
-                    runs.push(this.hand[idx+1]);
-                }
-                if(this.hand[idx+2] && tile.value+2 == this.hand[idx+2].value && tile.suit == this.hand[idx+2].suit){
-                    if(!this.hasValue(runs, this.hand[idx+2].value)){
-                        runs.push(this.hand[idx+2]);
-                    }
-                    break;
-                }
-            }
-        }
-        else if (tile.value+1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
-            if(this.hand[idx+1] && tile.value+2 == this.hand[idx+1].value && tile.suit == this.hand[idx].suit){
-                runs.push(tile, this.hand[idx], this.hand[idx+1]);
-            }
-        }
+    var low = this.lowEat(tile);
+    if(low){
+        runs.push(low);
+    }
+    var mid = this.midEat(tile);
+    if(mid){
+        runs.push(mid);
+    }
+    var high = this.highEat(tile);
+    if(high){
+        runs.push(high);
     }
     return runs;
 };
@@ -234,6 +246,20 @@ Player.prototype.hasValue = function(arr, value){
             return true;
         }
     }
+};
+Player.prototype.pickupRun = function(run){
+    console.log(run);
+    var runToPlay = [];
+    for(var idx = 0; idx < run.length; idx++){
+        for(var i = 0; i < this.hand.length; i++){
+            if(this.hand[i].value == run[idx].value && this.hand[i].suit == run[idx].suit){
+                var tile = this.hand.splice(i, 1);
+                runToPlay.push(tile[0]);
+                break;
+            }
+        }
+    }
+    this.played.push(runToPlay);
 };
 // Player.prototype.roll = function(){
 //     var roll = (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1);
