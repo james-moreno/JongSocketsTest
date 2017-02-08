@@ -5,6 +5,7 @@ var webSocket = function(client){
 
     var ids = [0,1,2,3];
     var clients = [];
+    var pickupActive = true;
 
     var giveID = function(socketID){
         if(ids.length > 0){
@@ -39,18 +40,6 @@ var webSocket = function(client){
         };
         io.sockets.emit("turnUpdate", turn);
     };
-    // var checkTurn = function(sid){
-    //     for(var idx = 0; idx < clients.length; idx++){
-    //         if(clients[idx].socketID == sid){
-    //             var player = clients[idx].playerID;
-    //             console.log('hi');
-    //             return game.players[clients[idx].playerID].turn;
-    //         }
-    //         else{
-    //             console.log('no');
-    //         }
-    //     }
-    // };
     var discardUpdate = function(){
         var discards = {
             discards: game.discards,
@@ -58,6 +47,38 @@ var webSocket = function(client){
         };
         io.sockets.emit('discardUpdate', discards);
     };
+
+    var checkActions = function(actionData, socket){
+        if(typeof(actionData.pung) == "number" || actionData.eats.length > 0){
+            if(typeof(actionData.pung) == "number"){
+                canPung(actionData.pung);
+            }
+            if(actionData.eats.length > 0){
+                canEat(actionData.eats);
+            }
+            var timer = 15;
+            var choiceTimer = setInterval(function () {
+                timer--;
+                if (pickupActive === false){
+                    clearInterval(choiceTimer);
+                }
+                io.to(socket).emit('timerUpdate', timer);
+                if (timer === 0) {
+                    pickupActive = false;
+                    clearInterval(choiceTimer);
+                    console.log('doing next turn')
+                    game.nextTurn();
+                    turnUpdate();
+                    sendTiles();
+                }
+            }, 1000);
+        }
+        else {
+            game.nextTurn();
+            turnUpdate();
+            sendTiles();
+        }
+    }
 
     var canPung = function(player){
         if(typeof(player) == "number"){
@@ -114,7 +135,6 @@ var webSocket = function(client){
     var io = require('socket.io').listen(client);
 
     io.sockets.on('connection', function (socket) {
-        var pickupActive = true;
         socket.on('cookieData', function(data){
             checkCookie(data, socket);
         });
@@ -127,31 +147,7 @@ var webSocket = function(client){
         socket.on('discardTile', function(data){
         var actionData = game.discard(data);
         discardUpdate();
-        if(typeof(actionData.pung) == "number" || actionData.eats.length > 0){
-            if(typeof(actionData.pung) == "number"){
-                canPung(actionData.pung);
-            }
-            if(actionData.eats.length > 0){
-                canEat(actionData.eats);
-            }
-            var timer = 15;
-            var choiceTimer = setInterval(function () {
-                timer--;
-                io.sockets.emit('timerUpdate', timer);
-                if (timer === 0) {
-                    pickupActive = false;
-                    clearInterval(choiceTimer);
-                    game.nextTurn();
-                    turnUpdate();
-                    sendTiles();
-                }
-            }, 1000);
-        }
-            else {
-                game.nextTurn();
-                turnUpdate();
-                sendTiles();
-            }
+        checkActions(actionData, socket);
         });
         socket.on('pickup', function(data){
             if(pickupActive){

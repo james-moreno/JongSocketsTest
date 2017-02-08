@@ -72,7 +72,6 @@ game.pickup = function(data){
         game.players[data.position].pickupRun(data.run);
     }
     game.turn = data.position;
-    console.log(game.players[data.position].played);
 };
 
 //Tile Class
@@ -248,7 +247,6 @@ Player.prototype.hasValue = function(arr, value){
     }
 };
 Player.prototype.pickupRun = function(run){
-    console.log(run);
     var runToPlay = [];
     for(var idx = 0; idx < run.length; idx++){
         for(var i = 0; i < this.hand.length; i++){
