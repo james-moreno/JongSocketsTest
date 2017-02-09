@@ -32,7 +32,9 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     };
 
     $scope.$on('socket:timerUpdate', function(event, time){
-        $scope.timer = time;
+        if($scope.eatable || $scope.pungable){
+            $scope.timer = time;
+        }
     });
 
     $scope.gameFullNotStarted = function(players){
@@ -114,5 +116,6 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
             gameSocket.emit('pickup', data);
         }
         $scope.canPick = false;
+        $scope.timer = undefined;
     };
 }]);

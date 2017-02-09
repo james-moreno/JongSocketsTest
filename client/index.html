@@ -39,7 +39,7 @@
                     </div>
                 </div>
             </p>
-            <p ng-show="yourTurn">Your Draw: <div ng-click="discard(draw)" ng-show="yourTurn" class="tile">{{draw.suit}} {{draw.value}}</div></p>
+            <p ng-show="draw">Your Draw: <div ng-click="discard(draw)" ng-show="draw" class="tile">{{draw.suit}} {{draw.value}}</div></p>
             <p>Players Connected: {{players}}</p>
             <button ng-show="gameFullNotStarted(players)" ng-click="startGame()">Start Game</button>
         </div>

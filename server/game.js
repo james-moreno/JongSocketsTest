@@ -44,11 +44,13 @@ game.discard = function(data){
         game.discards.push(game.discarded);
         game.discarded = handTile[0];
     }
-    game.players[data.position].hand.push(game.players[data.position].draw.pop());
     var actions = {
         eats: game.checkEats(handTile[0]),
         pung: game.checkPungs(handTile[0])
     };
+    if (game.players[data.position].draw.length > 0) {
+        game.players[data.position].hand.push(game.players[game.turn].draw.pop());
+    }
     return actions;
 };
 // Checking arbitrary order because only possible pung
@@ -66,11 +68,15 @@ game.checkEats = function(tile){
 };
 
 game.pickup = function(data){
+    console.log(data);
     game.players[data.position].hand.push(game.discarded);
-    game.discarded = null;
     if(Array.isArray(data.run)){
         game.players[data.position].pickupRun(data.run);
     }
+    else if(typeof(data.position) == 'number'){
+        game.players[data.position].pickupPung(game.discarded);
+    }
+    game.discarded = null;
     game.turn = data.position;
 };
 
@@ -141,12 +147,7 @@ function Player(playerID){
 Player.prototype.drawTile = function(){
     this.hand.push(newWall.wall.pop());
 };
-Player.prototype.discard = function(index){
-    var discard = this.hand.splice(index, 1);
-    if(this.hand.length){
-        newDiscard(discard[0]);
-    }
-};
+
 Player.prototype.sortBy = function (key, minor) {
 return function (o, p) {
     var a, b;
@@ -166,6 +167,7 @@ return function (o, p) {
 Player.prototype.sortHand = function(){
     this.hand.sort(this.sortBy('suit', this.sortBy('value')));
 };
+
 Player.prototype.checkPung = function(tile){
     var count = 0;
     for(var idx = 0; idx < this.hand.length; idx++){
@@ -245,6 +247,21 @@ Player.prototype.hasValue = function(arr, value){
             return true;
         }
     }
+};
+Player.prototype.pickupPung = function(tile){
+    var pungToPlay = [];
+    var count = 0;
+    for(var idx = 0; idx < this.hand.length; idx ++){
+        if(tile.suit == this.hand[idx].suit && tile.value == this.hand[idx].value){
+            var pushTile = this.hand.splice(idx, 1);
+            pungToPlay.push(pushTile[0]);
+            count++;
+        }
+        if(count > 3){
+            break;
+        }
+    }
+    this.played.push(pungToPlay);
 };
 Player.prototype.pickupRun = function(run){
     var runToPlay = [];
