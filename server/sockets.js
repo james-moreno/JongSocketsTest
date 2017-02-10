@@ -50,6 +50,7 @@ var webSocket = function(client){
 
     var checkActions = function(actionData){
         if(typeof(actionData.pung) == "number" || actionData.eats.length > 0){
+            pickupActive = true;
             if(typeof(actionData.pung) == "number"){
                 canPung(actionData.pung);
             }
@@ -145,13 +146,17 @@ var webSocket = function(client){
             turnUpdate();
         });
         socket.on('discardTile', function(data){
-        var actionData = game.discard(data);
-        discardUpdate();
-        checkActions(actionData);
-        });
+            console.log("Player "+(game.turn+1)+"'s discard:"+data.tileIndex);
+            var actionData = game.discard(data);
+            discardUpdate();
+            console.log('updated discards');
+            checkActions(actionData);
+            console.log('checked actions');
+            });
         socket.on('pickup', function(data){
             if(pickupActive){
                 game.pickup(data);
+                console.log("Player "+(game.turn+1)+" picked up a tile");
                 sendTiles();
                 discardUpdate();
                 turnUpdate();
