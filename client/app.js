@@ -100,6 +100,7 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         }
     });
     $scope.pickup = function(tiles){
+        console.log(tiles);
         if(Array.isArray(tiles)){
             var pickupData = {
                 run: tiles,

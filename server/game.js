@@ -68,12 +68,12 @@ game.checkEats = function(tile){
 };
 
 game.pickup = function(data){
-    console.log(data);
     game.players[data.position].hand.push(game.discarded);
     if(Array.isArray(data.run)){
         game.players[data.position].pickupRun(data.run);
     }
     else if(typeof(data.position) == 'number'){
+        console.log('running pickup pung');
         game.players[data.position].pickupPung(game.discarded);
     }
     game.discarded = null;
@@ -250,15 +250,13 @@ Player.prototype.hasValue = function(arr, value){
 };
 Player.prototype.pickupPung = function(tile){
     var pungToPlay = [];
-    var count = 0;
-    for(var idx = 0; idx < this.hand.length; idx ++){
-        if(tile.suit == this.hand[idx].suit && tile.value == this.hand[idx].value){
-            var pushTile = this.hand.splice(idx, 1);
-            pungToPlay.push(pushTile[0]);
-            count++;
-        }
-        if(count > 3){
-            break;
+    for(var j = 0; j < 3; j++){
+        for(var idx = 0; idx < this.hand.length; idx ++){
+            if(tile.suit == this.hand[idx].suit && tile.value == this.hand[idx].value){
+                var pushTile = this.hand.splice(idx, 1);
+                pungToPlay.push(pushTile[0]);
+                break;
+            }
         }
     }
     this.played.push(pungToPlay);
