@@ -35,23 +35,42 @@ game.giveTile = function(){
     game.players[game.turn].draw.push(game.wall.drawTile());
 };
 
+
+//Discard works on either a hand tile or the drawn tile, needs to be refactored because repeating code
 game.discard = function(data){
-    var handTile = game.players[data.position].hand.splice(data.tileIndex, 1);
-    if(game.discarded === null){
-        game.discarded = handTile[0];
+    if(data.suit){
+        var tile = game.players[game.turn].draw.pop();
+        if(game.discarded === null){
+            game.discarded = tile;
+        }
+        else {
+            game.discards.push(game.discarded);
+            game.discarded = tile;
+        }
+        var actions = {
+            eats: game.checkEats(tile),
+            pung: game.checkPungs(tile)
+        };
+        return actions;
     }
     else {
-        game.discards.push(game.discarded);
-        game.discarded = handTile[0];
+        var handTile = game.players[data.position].hand.splice(data.tileIndex, 1);
+        if(game.discarded === null){
+            game.discarded = handTile[0];
+        }
+        else {
+            game.discards.push(game.discarded);
+            game.discarded = handTile[0];
+        }
+        var actions = {
+            eats: game.checkEats(handTile[0]),
+            pung: game.checkPungs(handTile[0])
+        };
+        if (game.players[data.position].draw.length > 0) {
+            game.players[data.position].hand.push(game.players[game.turn].draw.pop());
+        }
+        return actions;
     }
-    var actions = {
-        eats: game.checkEats(handTile[0]),
-        pung: game.checkPungs(handTile[0])
-    };
-    if (game.players[data.position].draw.length > 0) {
-        game.players[data.position].hand.push(game.players[game.turn].draw.pop());
-    }
-    return actions;
 };
 // Checking arbitrary order because only possible pung
 game.checkPungs = function(tile){

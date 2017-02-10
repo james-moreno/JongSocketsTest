@@ -146,12 +146,10 @@ var webSocket = function(client){
             turnUpdate();
         });
         socket.on('discardTile', function(data){
-            console.log("Player "+(game.turn+1)+"'s discard:"+data.tileIndex);
+            console.log("Player "+(game.turn+1)+" discarded");
             var actionData = game.discard(data);
             discardUpdate();
-            console.log('updated discards');
             checkActions(actionData);
-            console.log('checked actions');
             });
         socket.on('pickup', function(data){
             if(pickupActive){
