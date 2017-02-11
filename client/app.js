@@ -11,6 +11,7 @@ app.factory('gameSocket', function (socketFactory){
     jongSocket.forward('canPung');
     jongSocket.forward('canEat');
     jongSocket.forward('timerUpdate');
+    jongSocket.forward('killTimer');
     return jongSocket;
 });
 
@@ -35,6 +36,9 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         if($scope.eatable || $scope.pungable){
             $scope.timer = time;
         }
+    });
+    $scope.$on('socket:killTimer', function(event){
+        $scope.timer = undefined;
     });
 
     $scope.gameFullNotStarted = function(players){
@@ -99,23 +103,21 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
             $scope.yourTurn = true;
         }
     });
+    $scope.eat = function(tiles){
+        var eatData = {
+            run: tiles,
+            position: $scope.position
+        };
+        $scope.eatable = false;
+        $scope.eatPressed = false;
+        gameSocket.emit('eat', eatData);
+        $scope.canPick = false;
+    };
     $scope.pickup = function(tiles){
-        console.log(tiles);
-        if(Array.isArray(tiles)){
-            var pickupData = {
-                run: tiles,
-                position: $scope.position
-            };
-            $scope.eatable = false;
-            $scope.eatPressed = false;
-            gameSocket.emit('pickup', pickupData);
-        }
-        else {
-            var data = {
-                position: $scope.position
-            };
-            gameSocket.emit('pickup', data);
-        }
+        var data = {
+            position: $scope.position
+        };
+        gameSocket.emit('pickup', data);
         $scope.canPick = false;
         $scope.timer = undefined;
     };

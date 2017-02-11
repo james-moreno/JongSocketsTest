@@ -92,7 +92,6 @@ game.pickup = function(data){
         game.players[data.position].pickupRun(data.run);
     }
     else if(typeof(data.position) == 'number'){
-        console.log('running pickup pung');
         game.players[data.position].pickupPung(game.discarded);
     }
     game.discarded = null;

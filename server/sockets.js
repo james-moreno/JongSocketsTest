@@ -6,6 +6,7 @@ var webSocket = function(client){
     var ids = [0,1,2,3];
     var clients = [];
     var pickupActive = true;
+    var wantsToEat;
 
     var giveID = function(socketID){
         if(ids.length > 0){
@@ -50,27 +51,59 @@ var webSocket = function(client){
 
     var checkActions = function(actionData){
         if(typeof(actionData.pung) == "number" || actionData.eats.length > 0){
+            var eatable;
+            var pungable;
             pickupActive = true;
             if(typeof(actionData.pung) == "number"){
                 canPung(actionData.pung);
+                pungable = true;
             }
             if(actionData.eats.length > 0){
                 canEat(actionData.eats);
+                eatable = true;
             }
             var eater = ((game.turn+1)%4);
             var timer = 15;
             var choiceTimer = setInterval(function () {
                 timer--;
-                io.to(clients[eater].socketID).emit('timerUpdate', timer);
                 if (pickupActive === false){
                     clearInterval(choiceTimer);
                 }
-                else if (timer === 0) {
-                    pickupActive = false;
-                    clearInterval(choiceTimer);
-                    game.nextTurn();
-                    turnUpdate();
-                    sendTiles();
+                else {
+                    if(eatable){
+                        io.to(clients[eater].socketID).emit('timerUpdate', timer);
+                    }
+                    if(pungable){
+                        io.to(clients[actionData.pung].socketID).emit('timerUpdate', timer);
+                    }
+                    if(!pungable && wantsToEat){
+                        pickupActive = false;
+                        clearInterval(choiceTimer);
+                        game.pickup(wantsToEat);
+                        sendTiles();
+                        discardUpdate();
+                        turnUpdate();
+                        wantsToEat = undefined;
+                        io.sockets.emit('killTimer');
+                    }
+                    else if(timer === 0 && wantsToEat){
+                        pickupActive = false;
+                        clearInterval(choiceTimer);
+                        game.pickup(wantsToEat);
+                        sendTiles();
+                        discardUpdate();
+                        turnUpdate();
+                        wantsToEat = undefined;
+                        io.sockets.emit('killTimer');
+                    }
+                    else if (timer === 0) {
+                        pickupActive = false;
+                        clearInterval(choiceTimer);
+                        game.nextTurn();
+                        turnUpdate();
+                        sendTiles();
+                        io.sockets.emit('killTimer');
+                    }
                 }
             }, 1000);
         }
@@ -150,7 +183,7 @@ var webSocket = function(client){
             var actionData = game.discard(data);
             discardUpdate();
             checkActions(actionData);
-            });
+        });
         socket.on('pickup', function(data){
             if(pickupActive){
                 game.pickup(data);
@@ -159,7 +192,12 @@ var webSocket = function(client){
                 discardUpdate();
                 turnUpdate();
                 pickupActive = false;
+                io.sockets.emit('killTimer');
             }
+        });
+        socket.on('eat', function(eatData){
+            wantsToEat = eatData;
+            socket.emit('killTimer');
         });
         // socket.on('checkTurn', function(){
         //     var check = checkTurn(socket.id);

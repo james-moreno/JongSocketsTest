@@ -19,7 +19,7 @@
             <div ng-show="canPick">
                 <button ng-show="pungable" ng-click="pickup()">Pung!</button>
                 <button ng-show="eatable" ng-click="eatPress()">Eat!</button>
-                <div ng-repeat="runs in eats" ng-show="eatPressed" ng-click="pickup(runs)">
+                <div ng-repeat="runs in eats" ng-show="eatPressed" ng-click="eat(runs)">
                     <div class="hand ng-class: tile" ng-repeat="tile in runs">
                         {{tile.value}} {{tile.suit}}
                     </div>
