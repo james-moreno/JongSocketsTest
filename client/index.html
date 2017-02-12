@@ -17,6 +17,7 @@
             <h3 ng-show="timer">{{timer}}</h3>
             <h3 ng-show="yourTurn">Your turn!</h3>
             <div ng-show="canPick">
+                <button ng-show="canPick" ng-click="cancel()">Cancel</button>
                 <button ng-show="pungable" ng-click="pickup()">Pung!</button>
                 <button ng-show="eatable" ng-click="eatPress()">Eat!</button>
                 <div ng-repeat="runs in eats" ng-show="eatPressed" ng-click="eat(runs)">

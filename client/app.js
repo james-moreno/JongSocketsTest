@@ -71,6 +71,7 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.played = data.played;
     });
     $scope.discard = function(index){
+        console.log('discarding tile '+index);
         if(typeof(index) == 'object'){
             index.position = $scope.position;
             gameSocket.emit('discardTile', index);
@@ -112,13 +113,16 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.eatPressed = false;
         gameSocket.emit('eat', eatData);
         $scope.canPick = false;
+        $scope.eats = undefined;
     };
     $scope.pickup = function(tiles){
+        console.log('picking up '+tiles);
         var data = {
             position: $scope.position
         };
         gameSocket.emit('pickup', data);
         $scope.canPick = false;
         $scope.timer = undefined;
+        $scope.pungable = false;
     };
 }]);

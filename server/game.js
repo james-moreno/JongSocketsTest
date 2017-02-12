@@ -16,6 +16,7 @@ game.addPlayer = function(position){
 };
 
 game.startGame = function(){
+    console.log('game starting');
      if(!game.started){
          game.started = true;
          game.wall.dealTiles();
@@ -28,6 +29,7 @@ game.nextTurn = function(){
     game.players[game.turn].turn = false;
     game.turn = (game.turn+1)%4;
     game.players[game.turn].turn = true;
+    console.log('player '+game.turn+' turn');
     game.giveTile();
 };
 
@@ -39,6 +41,7 @@ game.giveTile = function(){
 //Discard works on either a hand tile or the drawn tile, needs to be refactored because repeating code
 game.discard = function(data){
     if(data.suit){
+        console.log('discarded draw');
         var tile = game.players[game.turn].draw.pop();
         if(game.discarded === null){
             game.discarded = tile;
@@ -54,6 +57,7 @@ game.discard = function(data){
         return actions;
     }
     else {
+        console.log('discarded from hand');
         var handTile = game.players[data.position].hand.splice(data.tileIndex, 1);
         if(game.discarded === null){
             game.discarded = handTile[0];
@@ -89,13 +93,16 @@ game.checkEats = function(tile){
 game.pickup = function(data){
     game.players[data.position].hand.push(game.discarded);
     if(Array.isArray(data.run)){
+        console.log('picking up a run');
         game.players[data.position].pickupRun(data.run);
     }
     else if(typeof(data.position) == 'number'){
+        console.log('picking up a pung');
         game.players[data.position].pickupPung(game.discarded);
     }
     game.discarded = null;
     game.turn = data.position;
+    console.log('player'+game.turn+'turn');
 };
 
 //Tile Class

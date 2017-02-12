@@ -7,6 +7,7 @@ var webSocket = function(client){
     var clients = [];
     var pickupActive = true;
     var wantsToEat;
+    var cancel;
 
     var giveID = function(socketID){
         if(ids.length > 0){
@@ -50,6 +51,7 @@ var webSocket = function(client){
     };
 
     var checkActions = function(actionData){
+        console.log('checking actions');
         if(typeof(actionData.pung) == "number" || actionData.eats.length > 0){
             var eatable;
             var pungable;
@@ -179,7 +181,7 @@ var webSocket = function(client){
             turnUpdate();
         });
         socket.on('discardTile', function(data){
-            console.log("Player "+(game.turn+1)+" discarded");
+            console.log("Player "+(game.turn)+" discarded");
             var actionData = game.discard(data);
             discardUpdate();
             checkActions(actionData);
@@ -187,7 +189,7 @@ var webSocket = function(client){
         socket.on('pickup', function(data){
             if(pickupActive){
                 game.pickup(data);
-                console.log("Player "+(game.turn+1)+" picked up a tile");
+                console.log("Player "+(game.turn)+" picked up a tile");
                 sendTiles();
                 discardUpdate();
                 turnUpdate();
@@ -198,6 +200,9 @@ var webSocket = function(client){
         socket.on('eat', function(eatData){
             wantsToEat = eatData;
             socket.emit('killTimer');
+        });
+        socket.on('cancel', function(playerNumber){
+            cancel = playerNumber;
         });
         // socket.on('checkTurn', function(){
         //     var check = checkTurn(socket.id);
