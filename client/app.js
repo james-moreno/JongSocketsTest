@@ -38,7 +38,12 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         }
     });
     $scope.$on('socket:killTimer', function(event){
+        $scope.canPick = false;
         $scope.timer = undefined;
+        $scope.pungable = false;
+        $scope.eats = undefined;
+        $scope.eatable = false;
+        $scope.eatPressed = false;
     });
 
     $scope.gameFullNotStarted = function(players){
@@ -124,5 +129,14 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.canPick = false;
         $scope.timer = undefined;
         $scope.pungable = false;
+    };
+    $scope.cancel = function (){
+        gameSocket.emit('cancel', $scope.position);
+        $scope.canPick = false;
+        $scope.timer = undefined;
+        $scope.pungable = false;
+        $scope.eats = undefined;
+        $scope.eatable = false;
+        $scope.eatPressed = false;
     };
 }]);

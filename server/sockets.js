@@ -68,6 +68,10 @@ var webSocket = function(client){
             var timer = 15;
             var choiceTimer = setInterval(function () {
                 timer--;
+                if(pungable && cancel == actionData.pung){
+                    pungable = false;
+                    timer = 0;
+                }
                 if (pickupActive === false){
                     clearInterval(choiceTimer);
                 }
@@ -86,6 +90,7 @@ var webSocket = function(client){
                         discardUpdate();
                         turnUpdate();
                         wantsToEat = undefined;
+                        cancel = undefined;
                         io.sockets.emit('killTimer');
                     }
                     else if(timer === 0 && wantsToEat){
@@ -96,15 +101,18 @@ var webSocket = function(client){
                         discardUpdate();
                         turnUpdate();
                         wantsToEat = undefined;
+                        cancel = undefined;
                         io.sockets.emit('killTimer');
                     }
-                    else if (timer === 0) {
+                    else if (timer === 0 || pungable && cancel == actionData.pung && eatable && cancel == eater || !pungable && cancel == eater) {
+                        console.log('Timer finished or potential all actions cancelled');
                         pickupActive = false;
                         clearInterval(choiceTimer);
                         game.nextTurn();
                         turnUpdate();
                         sendTiles();
                         io.sockets.emit('killTimer');
+                        cancel = undefined;
                     }
                 }
             }, 1000);
@@ -203,6 +211,7 @@ var webSocket = function(client){
         });
         socket.on('cancel', function(playerNumber){
             cancel = playerNumber;
+            console.log(cancel)
         });
         // socket.on('checkTurn', function(){
         //     var check = checkTurn(socket.id);
