@@ -74,18 +74,21 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.played = data.played;
     });
     $scope.discard = function(index){
-        if(typeof(index) == 'object'){
+
+        if($scope.yourTurn && typeof(index) == 'object'){
+            $scope.turnTimer = undefined;
+            $scope.yourTurn = false;
             index.position = $scope.position;
             gameSocket.emit('discardTile', index);
-            $scope.yourTurn = false;
         }
-        if($scope.yourTurn && typeof(index) == 'number'){
+        else if($scope.yourTurn && typeof(index) == 'number'){
+            $scope.turnTimer = undefined;
+            $scope.yourTurn = false;
             var discardData = {
                 tileIndex: index,
                 position: $scope.position
             };
             gameSocket.emit('discardTile', discardData);
-            $scope.yourTurn = false;
         }
     };
     $scope.$on('socket:discardUpdate', function(event, discards){

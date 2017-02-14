@@ -33,6 +33,21 @@ game.nextTurn = function(){
     game.giveTile();
 };
 
+game.outOfTime = function(){
+    var tile;
+    if(game.players[game.turn].draw[0]){
+        tile = game.players[game.turn].draw;
+        return game.discard(tile[0]);
+    }
+    else {
+        tile = {
+        tileIndex: game.players[game.turn].hand.length-1,
+        position: game.turn
+    };
+        return game.discard(tile);
+    }
+};
+
 game.giveTile = function(){
     game.players[game.turn].draw.push(game.wall.drawTile());
 };
@@ -40,8 +55,8 @@ game.giveTile = function(){
 
 //Discard works on either a hand tile or the drawn tile, needs to be refactored because repeating code
 game.discard = function(data){
+    console.log(data);
     if(data.suit){
-        console.log('discarded draw');
         var tile = game.players[game.turn].draw.pop();
         if(game.discarded === null){
             game.discarded = tile;
@@ -209,6 +224,7 @@ Player.prototype.checkPung = function(tile){
 };
 
 Player.prototype.lowEat = function(tile){
+    console.log(tile);
     var run = [];
     for(var idx = 0 ; idx < this.hand.length; idx ++){
         if(tile.value-1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
@@ -251,6 +267,7 @@ Player.prototype.highEat = function(tile){
     return;
 };
 Player.prototype.checkEat = function(tile){
+    console.log(tile);
     var runs = [];
     var low = this.lowEat(tile);
     if(low){

@@ -44,6 +44,7 @@ var webSocket = function(client){
         io.sockets.emit("turnUpdate", turn);
     };
     var discardUpdate = function(){
+        console.log('updating discards');
         var discards = {
             discards: game.discards,
             discarded: game.discarded
@@ -52,21 +53,24 @@ var webSocket = function(client){
     };
     var discardMade = false;
     var turnTimerFunction = function(){
-        var time = 15;
+        var time = 5;
         console.log('timer started for player'+game.turn);
         var turnTimer = setInterval(function () {
             time --;
             io.to(clients[game.turn].socketID).emit('turnTimer', time);
             if(discardMade){
                 console.log('discard made: ending timer');
-                clearInterval(turnTimer);
-                discardMade = false;
                 game.nextTurn();
                 turnUpdate();
                 sendTiles();
+                clearInterval(turnTimer);
+                discardMade = false;
             }
             else if(time === 0){
                 console.log('timer ended');
+                checkActions(game.outOfTime());
+                turnUpdate();
+                discardUpdate();
                 clearInterval(turnTimer);
             }
         }, 1000);
@@ -104,6 +108,7 @@ var webSocket = function(client){
                         io.to(clients[actionData.pung].socketID).emit('timerUpdate', timer);
                     }
                     if(!pungable && wantsToEat){
+                        console.log('eating tile')
                         pickupActive = false;
                         clearInterval(choiceTimer);
                         game.pickup(wantsToEat);
@@ -116,6 +121,7 @@ var webSocket = function(client){
                         io.sockets.emit('killTimer');
                     }
                     else if(timer === 0 && wantsToEat){
+                        console.log('eating tile')
                         pickupActive = false;
                         clearInterval(choiceTimer);
                         game.pickup(wantsToEat);
@@ -141,8 +147,9 @@ var webSocket = function(client){
                 }
             }, 1000);
         }
-        else {
+        else if(!discardMade){
             console.log('no actions to make')
+            game.nextTurn();
             turnUpdate();
             turnTimerFunction();
             sendTiles();
