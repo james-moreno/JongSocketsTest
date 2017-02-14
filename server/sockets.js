@@ -37,6 +37,7 @@ var webSocket = function(client){
         }
     };
     var turnUpdate = function(){
+        console.log('updating turn')
         var turn = {
             turn: game.turn
         };
@@ -49,7 +50,27 @@ var webSocket = function(client){
         };
         io.sockets.emit('discardUpdate', discards);
     };
-
+    var discardMade = false;
+    var turnTimerFunction = function(){
+        var time = 15;
+        console.log('timer started for player'+game.turn);
+        var turnTimer = setInterval(function () {
+            time --;
+            io.to(clients[game.turn].socketID).emit('turnTimer', time);
+            if(discardMade){
+                console.log('discard made: ending timer');
+                clearInterval(turnTimer);
+                discardMade = false;
+                game.nextTurn();
+                turnUpdate();
+                sendTiles();
+            }
+            else if(time === 0){
+                console.log('timer ended');
+                clearInterval(turnTimer);
+            }
+        }, 1000);
+    };
     var checkActions = function(actionData){
         console.log('checking actions');
         if(typeof(actionData.pung) == "number" || actionData.eats.length > 0){
@@ -89,6 +110,7 @@ var webSocket = function(client){
                         sendTiles();
                         discardUpdate();
                         turnUpdate();
+                        turnTimerFunction();
                         wantsToEat = undefined;
                         cancel = undefined;
                         io.sockets.emit('killTimer');
@@ -100,6 +122,7 @@ var webSocket = function(client){
                         sendTiles();
                         discardUpdate();
                         turnUpdate();
+                        turnTimerFunction();
                         wantsToEat = undefined;
                         cancel = undefined;
                         io.sockets.emit('killTimer');
@@ -110,6 +133,7 @@ var webSocket = function(client){
                         clearInterval(choiceTimer);
                         game.nextTurn();
                         turnUpdate();
+                        turnTimerFunction();
                         sendTiles();
                         io.sockets.emit('killTimer');
                         cancel = undefined;
@@ -118,8 +142,9 @@ var webSocket = function(client){
             }, 1000);
         }
         else {
-            game.nextTurn();
+            console.log('no actions to make')
             turnUpdate();
+            turnTimerFunction();
             sendTiles();
         }
     };
@@ -186,9 +211,11 @@ var webSocket = function(client){
             socket.emit('gameStarting');
             game.startGame();
             sendTiles();
+            turnTimerFunction();
             turnUpdate();
         });
         socket.on('discardTile', function(data){
+            discardMade = true;
             console.log("Player "+(game.turn)+" discarded");
             var actionData = game.discard(data);
             discardUpdate();
@@ -200,6 +227,7 @@ var webSocket = function(client){
                 console.log("Player "+(game.turn)+" picked up a tile");
                 sendTiles();
                 discardUpdate();
+                turnTimerFunction();
                 turnUpdate();
                 pickupActive = false;
                 io.sockets.emit('killTimer');
@@ -211,7 +239,7 @@ var webSocket = function(client){
         });
         socket.on('cancel', function(playerNumber){
             cancel = playerNumber;
-            console.log(cancel)
+            console.log(cancel);
         });
         // socket.on('checkTurn', function(){
         //     var check = checkTurn(socket.id);

@@ -16,6 +16,7 @@
             </p>
             <h3 ng-show="timer">{{timer}}</h3>
             <h3 ng-show="yourTurn">Your turn!</h3>
+            <h3 ng-show="yourTurn">{{turnTimer}}</h3>
             <div ng-show="canPick">
                 <button ng-show="canPick" ng-click="cancel()">Cancel</button>
                 <button ng-show="pungable" ng-click="pickup()">Pung!</button>
