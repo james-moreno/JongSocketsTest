@@ -37,7 +37,8 @@ var webSocket = function(client){
         }
     };
     var turnUpdate = function(){
-        console.log('updating turn')
+        console.log('updating turn');
+        console.log('player '+game.turn+'turn');
         var turn = {
             turn: game.turn
         };
@@ -52,26 +53,26 @@ var webSocket = function(client){
         io.sockets.emit('discardUpdate', discards);
     };
     var discardMade = false;
+    var testTimerTimer = 15;
+
     var turnTimerFunction = function(){
-        var time = 5;
+        var time = 15;
         console.log('timer started for player'+game.turn);
         var turnTimer = setInterval(function () {
+            console.log('turn time '+time);
             time --;
             io.to(clients[game.turn].socketID).emit('turnTimer', time);
-            if(discardMade){
-                console.log('discard made: ending timer');
-                game.nextTurn();
+            if(discardMade || time === 0){
+                console.log('discard made or timer ended');
+                if(time === 0){
+                    console.log('timer ended')
+                    checkActions(game.outOfTime());
+                }
                 turnUpdate();
                 sendTiles();
-                clearInterval(turnTimer);
-                discardMade = false;
-            }
-            else if(time === 0){
-                console.log('timer ended');
-                checkActions(game.outOfTime());
-                turnUpdate();
                 discardUpdate();
                 clearInterval(turnTimer);
+                discardMade = false;
             }
         }, 1000);
     };
@@ -91,7 +92,9 @@ var webSocket = function(client){
             }
             var eater = ((game.turn+1)%4);
             var timer = 15;
+            console.log('running action timer');
             var choiceTimer = setInterval(function () {
+                console.log('action timer: '+timer);
                 timer--;
                 if(pungable && cancel == actionData.pung){
                     pungable = false;
@@ -108,7 +111,8 @@ var webSocket = function(client){
                         io.to(clients[actionData.pung].socketID).emit('timerUpdate', timer);
                     }
                     if(!pungable && wantsToEat){
-                        console.log('eating tile')
+                        console.log('eating tile');
+                        discardMade = false;
                         pickupActive = false;
                         clearInterval(choiceTimer);
                         game.pickup(wantsToEat);
@@ -121,7 +125,8 @@ var webSocket = function(client){
                         io.sockets.emit('killTimer');
                     }
                     else if(timer === 0 && wantsToEat){
-                        console.log('eating tile')
+                        console.log('eating tile');
+                        discardMade = false;
                         pickupActive = false;
                         clearInterval(choiceTimer);
                         game.pickup(wantsToEat);
@@ -135,6 +140,7 @@ var webSocket = function(client){
                     }
                     else if (timer === 0 || pungable && cancel == actionData.pung && eatable && cancel == eater || !pungable && cancel == eater) {
                         console.log('Timer finished or potential all actions cancelled');
+                        discardMade = false;
                         pickupActive = false;
                         clearInterval(choiceTimer);
                         game.nextTurn();
@@ -147,8 +153,8 @@ var webSocket = function(client){
                 }
             }, 1000);
         }
-        else if(!discardMade){
-            console.log('no actions to make')
+        else {
+            console.log('no actions to make');
             game.nextTurn();
             turnUpdate();
             turnTimerFunction();
@@ -225,8 +231,8 @@ var webSocket = function(client){
             discardMade = true;
             console.log("Player "+(game.turn)+" discarded");
             var actionData = game.discard(data);
-            discardUpdate();
             checkActions(actionData);
+            discardUpdate();
         });
         socket.on('pickup', function(data){
             if(pickupActive){

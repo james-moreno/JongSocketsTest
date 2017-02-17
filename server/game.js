@@ -29,7 +29,6 @@ game.nextTurn = function(){
     game.players[game.turn].turn = false;
     game.turn = (game.turn+1)%4;
     game.players[game.turn].turn = true;
-    console.log('player '+game.turn+' turn');
     game.giveTile();
 };
 
@@ -56,6 +55,7 @@ game.giveTile = function(){
 //Discard works on either a hand tile or the drawn tile, needs to be refactored because repeating code
 game.discard = function(data){
     console.log(data);
+    var actions;
     if(data.suit){
         var tile = game.players[game.turn].draw.pop();
         if(game.discarded === null){
@@ -65,7 +65,7 @@ game.discard = function(data){
             game.discards.push(game.discarded);
             game.discarded = tile;
         }
-        var actions = {
+        actions = {
             eats: game.checkEats(tile),
             pung: game.checkPungs(tile)
         };
@@ -81,7 +81,7 @@ game.discard = function(data){
             game.discards.push(game.discarded);
             game.discarded = handTile[0];
         }
-        var actions = {
+        actions = {
             eats: game.checkEats(handTile[0]),
             pung: game.checkPungs(handTile[0])
         };
@@ -117,7 +117,7 @@ game.pickup = function(data){
     }
     game.discarded = null;
     game.turn = data.position;
-    console.log('player'+game.turn+'turn');
+    console.log('player '+game.turn+' turn');
 };
 
 //Tile Class
@@ -223,8 +223,21 @@ Player.prototype.checkPung = function(tile){
     }
 };
 
+Player.prototype.pickupPung = function(tile){
+    var pungToPlay = [];
+    for(var j = 0; j < 3; j++){
+        for(var idx = 0; idx < this.hand.length; idx ++){
+            if(tile.suit == this.hand[idx].suit && tile.value == this.hand[idx].value){
+                var pushTile = this.hand.splice(idx, 1);
+                pungToPlay.push(pushTile[0]);
+                break;
+            }
+        }
+    }
+    this.played.push(pungToPlay);
+};
+
 Player.prototype.lowEat = function(tile){
-    console.log(tile);
     var run = [];
     for(var idx = 0 ; idx < this.hand.length; idx ++){
         if(tile.value-1 == this.hand[idx].value && tile.suit == this.hand[idx].suit){
@@ -266,8 +279,8 @@ Player.prototype.highEat = function(tile){
     }
     return;
 };
+
 Player.prototype.checkEat = function(tile){
-    console.log(tile);
     var runs = [];
     var low = this.lowEat(tile);
     if(low){
@@ -283,26 +296,7 @@ Player.prototype.checkEat = function(tile){
     }
     return runs;
 };
-Player.prototype.hasValue = function(arr, value){
-    for(var idx = 0; idx < arr.length ; idx++){
-        if(arr[idx].value == value){
-            return true;
-        }
-    }
-};
-Player.prototype.pickupPung = function(tile){
-    var pungToPlay = [];
-    for(var j = 0; j < 3; j++){
-        for(var idx = 0; idx < this.hand.length; idx ++){
-            if(tile.suit == this.hand[idx].suit && tile.value == this.hand[idx].value){
-                var pushTile = this.hand.splice(idx, 1);
-                pungToPlay.push(pushTile[0]);
-                break;
-            }
-        }
-    }
-    this.played.push(pungToPlay);
-};
+
 Player.prototype.pickupRun = function(run){
     var runToPlay = [];
     for(var idx = 0; idx < run.length; idx++){
@@ -315,6 +309,14 @@ Player.prototype.pickupRun = function(run){
         }
     }
     this.played.push(runToPlay);
+};
+
+Player.prototype.hasValue = function(arr, value){
+    for(var idx = 0; idx < arr.length ; idx++){
+        if(arr[idx].value == value){
+            return true;
+        }
+    }
 };
 // Player.prototype.roll = function(){
 //     var roll = (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1);
