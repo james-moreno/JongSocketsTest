@@ -65,7 +65,7 @@ var webSocket = function(client){
             if(discardMade || time === 0){
                 console.log('discard made or timer ended');
                 if(time === 0){
-                    console.log('timer ended')
+                    console.log('timer ended');
                     checkActions(game.outOfTime());
                 }
                 turnUpdate();
