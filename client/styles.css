@@ -9,3 +9,14 @@
     list-style: none;
     display: inline-block;
 }
+.pickupButt {
+    overflow: hidden;
+    background: white;
+    border: 5px solid red;
+    border-radius: 30px;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+}

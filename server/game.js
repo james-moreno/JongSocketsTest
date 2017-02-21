@@ -67,8 +67,10 @@ game.discard = function(data){
         }
         actions = {
             eats: game.checkEats(tile),
-            pung: game.checkPungs(tile)
+            pung: game.checkPungs(tile),
+            kong: game.checkKongs(tile)
         };
+        console.log(actions);
         return actions;
     }
     else {
@@ -83,11 +85,13 @@ game.discard = function(data){
         }
         actions = {
             eats: game.checkEats(handTile[0]),
-            pung: game.checkPungs(handTile[0])
+            pung: game.checkPungs(handTile[0]),
+            kong: game.checkKongs(handTile[0])
         };
         if (game.players[data.position].draw.length > 0) {
             game.players[data.position].hand.push(game.players[game.turn].draw.pop());
         }
+        console.log(actions);
         return actions;
     }
 };
@@ -98,6 +102,17 @@ game.checkPungs = function(tile){
             continue;
         }
         if(game.players[i].checkPung(tile)) {
+            return i;
+        }
+    }
+};
+
+game.checkKongs = function(tile){
+    for(var i = 0; i < game.players.length; i++){
+        if(i == game.turn){
+            continue;
+        }
+        if(game.players[i].checkKong(tile)) {
             return i;
         }
     }
@@ -121,6 +136,15 @@ game.pickup = function(data){
     game.discarded = null;
     game.turn = data.position;
     console.log('player '+game.turn+' turn');
+};
+game.kongPickup = function(data){
+    game.players[data.position].hand.push(game.discarded);
+    console.log('konging the discard');
+    game.players[data.position].pickupKong(game.discarded);
+    game.discarded = null;
+    game.turn = data.position;
+    console.log('player '+game.turn+' turn');
+    game.giveTile();
 };
 
 //Tile Class
@@ -218,7 +242,22 @@ Player.prototype.checkPung = function(tile){
             count++;
         }
     }
-    if (count == 2) {
+    if (count >= 2) {
+        return true;
+    }
+    else {
+        return false;
+    }
+};
+
+Player.prototype.checkKong = function(tile){
+    var count = 0;
+    for(var idx = 0; idx < this.hand.length; idx++){
+        if(this.hand[idx].suit == tile.suit && this.hand[idx].value == tile.value){
+            count++;
+        }
+    }
+    if (count == 3) {
         return true;
     }
     else {
@@ -238,6 +277,20 @@ Player.prototype.pickupPung = function(tile){
         }
     }
     this.played.push(pungToPlay);
+};
+
+Player.prototype.pickupKong = function(tile){
+    var kongToPlay = [];
+    for(var i = 0; i < 4; i++){
+        for(var idx = 0; idx < this.hand.length; idx ++){
+            if(tile.suit == this.hand[idx].suit && tile.value == this.hand[idx].value){
+                var pushTile = this.hand.splice(idx, 1);
+                kongToPlay.push(pushTile[0]);
+                break;
+            }
+        }
+    }
+    this.played.push(kongToPlay);
 };
 
 Player.prototype.lowEat = function(tile){

@@ -10,6 +10,7 @@ app.factory('gameSocket', function (socketFactory){
     jongSocket.forward('turnUpdate');
     jongSocket.forward('canPung');
     jongSocket.forward('canEat');
+    jongSocket.forward('canKong');
     jongSocket.forward('timerUpdate');
     jongSocket.forward('killTimer');
     jongSocket.forward('turnTimer');
@@ -23,6 +24,7 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     gameSocket.emit('cookieData', user_cookie);
     $scope.yourTurn = false;
     $scope.canPick = false;
+    $scope.kongable = false;
     $scope.pungable = false;
     $scope.eatable = false;
     $scope.gameStarted = false;
@@ -95,6 +97,10 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.discards = discards.discards;
         $scope.discarded = discards.discarded;
     });
+    $scope.$on('socket:canKong', function(event){
+        $scope.canPick = true;
+        $scope.kongable = true;
+    });
     $scope.$on('socket:canPung', function(event){
         $scope.canPick = true;
         $scope.pungable = true;
@@ -126,7 +132,7 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.canPick = false;
         $scope.eats = undefined;
     };
-    $scope.pickup = function(tiles){
+    $scope.pickup = function(){
         var data = {
             position: $scope.position
         };
@@ -134,6 +140,15 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
         $scope.canPick = false;
         $scope.timer = undefined;
         $scope.pungable = false;
+    };
+    $scope.kongPickup = function(){
+        var data = {
+            position: $scope.position
+        };
+        gameSocket.emit('kongPickup', data);
+        $scope.canPick = false;
+        $scope.timer = undefined;
+        $scope.kongable = false;
     };
     $scope.cancel = function (){
         gameSocket.emit('cancel', $scope.position);

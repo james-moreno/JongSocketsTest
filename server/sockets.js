@@ -78,10 +78,15 @@ var webSocket = function(client){
     };
     var checkActions = function(actionData){
         console.log('checking actions');
-        if(typeof(actionData.pung) == "number" || actionData.eats.length > 0){
+        if(typeof(actionData.kong) == "number" || typeof(actionData.pung) == "number" || actionData.eats.length > 0){
             var eatable;
             var pungable;
+            var kongable;
             pickupActive = true;
+            if(typeof(actionData.kong) == "number"){
+                canKong(actionData.kong);
+                kongable = true;
+            }
             if(typeof(actionData.pung) == "number"){
                 canPung(actionData.pung);
                 pungable = true;
@@ -100,6 +105,10 @@ var webSocket = function(client){
                     pungable = false;
                     timer = 0;
                 }
+                if(kongable && cancel == actionData.kong){
+                    kongable = false;
+                    timer = 0;
+                }
                 if (pickupActive === false){
                     clearInterval(choiceTimer);
                 }
@@ -109,6 +118,9 @@ var webSocket = function(client){
                     }
                     if(pungable){
                         io.to(clients[actionData.pung].socketID).emit('timerUpdate', timer);
+                    }
+                    if(kongable){
+                        io.to(clients[actionData.kong].socketID).emit('timerUpdate', timer);
                     }
                     if(!pungable && wantsToEat){
                         console.log('eating tile');
@@ -165,6 +177,11 @@ var webSocket = function(client){
     var canPung = function(player){
         if(typeof(player) == "number"){
             io.to(clients[player].socketID).emit('canPung');
+        }
+    };
+    var canKong = function(player){
+        if(typeof(player) == "number"){
+            io.to(clients[player].socketID).emit('canKong');
         }
     };
 
@@ -237,7 +254,19 @@ var webSocket = function(client){
         socket.on('pickup', function(data){
             if(pickupActive){
                 game.pickup(data);
-                console.log("Player "+(game.turn)+" picked up a tile");
+                console.log("Player "+(game.turn)+" PUNGed a tile");
+                sendTiles();
+                discardUpdate();
+                turnTimerFunction();
+                turnUpdate();
+                pickupActive = false;
+                io.sockets.emit('killTimer');
+            }
+        });
+        socket.on('kongPickup', function(data){
+            if(pickupActive){
+                game.kongPickup(data);
+                console.log("Player "+(game.turn)+" KONGed a tile");
                 sendTiles();
                 discardUpdate();
                 turnTimerFunction();
