@@ -94,6 +94,9 @@ game.discard = function(data){
 // Checking arbitrary order because only possible pung
 game.checkPungs = function(tile){
     for(var i = 0; i < game.players.length; i++){
+        if(i == game.turn){
+            continue;
+        }
         if(game.players[i].checkPung(tile)) {
             return i;
         }
