@@ -31,6 +31,10 @@ app.controller('testController', ['$scope', '$cookies', 'gameSocket',  function(
     $scope.timer = undefined;
     $scope.turnTimer = undefined;
     $scope.eatPressed = false;
+    $scope.testTile = {
+        suit: "char",
+        value: 1
+    };
 
     $scope.eatPress = function(){
         $scope.eatPressed = true;

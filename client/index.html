@@ -8,15 +8,19 @@
     </head>
     <body>
         <div ng-controller="testController">
-            <p>Discards:
-                <span ng-show="discards" class="hand ng-class: tile" ng-repeat="tile in discards">{{tile.suit}} {{tile.value}}</span>
-            </p>
-            <p>Most Recent Discard:
-                <span ng-show="discarded" class="hand ng-class: tile">{{discarded.suit}} {{discarded.value}}</span>
-            </p>
-            <h3 ng-show="timer">{{timer}}</h3>
-            <h3 ng-show="yourTurn">Your turn!</h3>
-            <h3 ng-show="yourTurn">{{turnTimer}}</h3>
+            <h3 class='gameText'>MAHJONG</h3>
+            <span ng-show="discards" class="hand" ng-repeat="tile in discards">
+                <img class="playedTile" ng-src="./imgs/{{tile.value}}{{tile.suit}}.png"/>
+            </span>
+            <span ng-show="discarded" class="hand" id="discarded">
+                <img class="playedTile" ng-src="./imgs/{{discarded.value}}{{discarded.suit}}.png"/>
+            </span>
+            <!-- <button class="pickupButt" ng-click="cancel()">Cancel</button>
+            <img class="playedTile" ng-src="./imgs/{{testTile.value}}{{testTile.suit}}.png"/>
+            <img class="handTile" ng-src="./imgs/{{testTile.value}}{{testTile.suit}}.png"/> -->
+            <h3 class="gameText timer" ng-show="timer">{{timer}}</h3>
+            <h3 class="gameText timer" ng-show="yourTurn">Your turn!</h3>
+            <h3 class="gameText timer" ng-show="yourTurn">{{turnTimer}}</h3>
             <div ng-show="canPick">
                 <button class="pickupButt" ng-show="canPick" ng-click="cancel()">Cancel</button>
                 <button class="pickupButt" ng-show="pungable" ng-click="pickup()">Pung!</button>
@@ -24,27 +28,29 @@
                 <button class="pickupButt" ng-show="eatable" ng-click="eatPress()">Eat!</button>
                 <div ng-repeat="runs in eats" ng-show="eatPressed" ng-click="eat(runs)">
                     <div class="hand ng-class: tile" ng-repeat="tile in runs">
-                        {{tile.value}} {{tile.suit}}
+                        <img class="handTile" ng-src="./imgs/{{tile.value}}{{tile.suit}}.png"/>
                     </div>
                 </div>
             </div>
-            <p>Your Tiles:
+            <p>
                 <div id="hand">
-                    <div ng-click="discard($index)" class="hand ng-class: tile" ng-repeat="tile in hand">
-                        {{tile.value}} {{tile.suit}}
+                    <div id="played" class="hand" ng-repeat="runs in played">
+                        <div class="hand" ng-repeat="tile in runs">
+                            <img class="playedTile" ng-src="./imgs/{{tile.value}}{{tile.suit}}.png"/>
+                        </div>
                     </div>
+                    <div ng-click="discard($index)" class="hand" ng-repeat="tile in hand">
+                        <img class="handTile" ng-src="./imgs/{{tile.value}}{{tile.suit}}.png"/>
+                    </div>
+                    <div ng-click="discard(draw)" ng-show="draw" class="hand">
+                        <img class="handTile" ng-src="./imgs/{{draw.value}}{{draw.suit}}.png"/>
+                    </div>
+                    <p ng-show="hand">YOUR HAND</p>
                 </div>
             </p>
-            <p>Played Tiles:
-                <div ng-repeat="runs in played">
-                    <div class="hand ng-class: tile" ng-repeat="tile in runs">
-                        {{tile.value}} {{tile.suit}}
-                    </div>
-                </div>
-            </p>
-            <p ng-show="draw">Your Draw: <div ng-click="discard(draw)" ng-show="draw" class="tile">{{draw.suit}} {{draw.value}}</div></p>
-            <p>Players Connected: {{players}}</p>
-            <button ng-show="gameFullNotStarted(players)" ng-click="startGame()">Start Game</button>
+
+            <p class="gameText">Players Connected: {{players}}</p>
+            <button id="startButton" ng-show="gameFullNotStarted(players)" ng-click="startGame()">Start Game</button>
         </div>
         <script type ="text/javascript" src="socket.io/socket.io.js"></script>
         <script type="text/javascript" src="angular/angular.js"></script>
